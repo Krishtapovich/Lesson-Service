@@ -1,3 +1,4 @@
+using API.Extensions;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,16 +13,20 @@ namespace API
     public class Startup
     {
         private readonly IConfiguration configuration;
+        private readonly BotConfiguration botConfiguration;
 
         public Startup(IConfiguration configuration)
         {
             this.configuration = configuration;
+            botConfiguration = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddBotServices(botConfiguration);
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
