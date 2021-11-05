@@ -1,4 +1,5 @@
 using API.Services.BotServices;
+using Domain.Repositories.BotRepository;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 
@@ -13,7 +14,8 @@ namespace API.Extensions
             services.AddHttpClient("tgwebhook")
                 .AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botConfiguration.Token, client));
 
-            services.AddScoped<BotUpdateService>();
+            services.AddSingleton<IBotRepository, BotRepository>();
+            services.AddSingleton<BotUpdateService>();
 
             return services;
         }

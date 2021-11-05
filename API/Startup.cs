@@ -23,10 +23,6 @@ namespace API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddBotServices(botConfiguration);
-
-            services.AddControllers().AddNewtonsoftJson();
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -34,7 +30,10 @@ namespace API
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
-            });
+            }, ServiceLifetime.Singleton);
+
+            services.AddBotServices(botConfiguration);
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
