@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace API.Services.BotServices
 {
@@ -12,7 +13,7 @@ namespace API.Services.BotServices
     {
         private readonly ITelegramBotClient botClient;
         private readonly IBotRepository botRepository;
-        private bool isAuthorized;
+        private bool isDataReceiving;
 
         public BotUpdateService(ITelegramBotClient botClient, IBotRepository botRepository)
         {
@@ -20,34 +21,44 @@ namespace API.Services.BotServices
             this.botRepository = botRepository;
         }
 
-        public async Task HandleUpdate(Update update)
+        public async Task HandleUpdateAsync(Update update)
         {
             var handler = update.Type switch
             {
-                UpdateType.Message => MessageReceived(update.Message),
-                _ => botClient.SendTextMessageAsync(update.Message.Chat.Id, "default")
+                UpdateType.Message => MessageReceivedAsync(update.Message),
+                _ => UnknownMessageAsync(update.Message)
             };
 
             await handler;
         }
 
-        private async Task MessageReceived(Message message)
+        private async Task UnknownMessageAsync(Message message) =>
+            await botClient.SendTextMessageAsync(message.Chat.Id, BotConstants.Unknown, replyToMessageId: message.MessageId);
+
+
+        private async Task MessageReceivedAsync(Message message)
         {
+
             var action = message.Text switch
             {
-                "/start" => Authorize(message.Chat.Id),
-                _ => ParseMessage(message)
+                "/start" => GetDataAsync(message.Chat.Id, false),
+                "Update data" => GetDataAsync(message.Chat.Id, true),
+                _ => isDataReceiving ? ParseDataAsync(message) : UnknownMessageAsync(message)
             };
+            await action;
         }
 
-        private async Task Authorize(long chatId)
+        private async Task GetDataAsync(long chatId, bool isUpdatingData)
         {
-            var fleg = botRepository.CheckIfAuthorized(chatId);
-            await botClient.SendTextMessageAsync(chatId, BotConstants.AuthorizationText);
+            isDataReceiving = true;
+            var flag = !isUpdatingData && await botRepository.CheckIfAuthorizedAsync(chatId);
+            await (flag ? botClient.SendTextMessageAsync(chatId, BotConstants.Authorized)
+                        : botClient.SendTextMessageAsync(chatId, BotConstants.ReceiveData));
         }
 
-        private async Task ParseMessage(Message message)
+        private async Task ParseDataAsync(Message message)
         {
+            var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { "Update data" }, resizeKeyboard: true);
             var data = message.Text.Split("\n");
             var student = new Student
             {
@@ -56,8 +67,10 @@ namespace API.Services.BotServices
                 LastName = data[1],
                 Group = new Group { Number = long.Parse(data[2]) }
             };
-            await botRepository.AddStudent(student);
-            await botClient.SendTextMessageAsync(message.Chat.Id, BotConstants.DataSaved);
+            var isAuthorized = await botRepository.CheckIfAuthorizedAsync(message.Chat.Id);
+            await (isAuthorized ? botRepository.UpdateStudentAsync(student) : botRepository.AddStudentAsync(student));
+            await botClient.SendTextMessageAsync(message.Chat.Id, BotConstants.DataSaved, replyMarkup: replyButton);
+            isDataReceiving = false;
         }
 
     }

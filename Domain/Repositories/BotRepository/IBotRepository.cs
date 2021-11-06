@@ -5,9 +5,9 @@ namespace Domain.Repositories.BotRepository
 {
     public interface IBotRepository
     {
-        Task AddStudent(Student student);
-        Task<bool> CheckIfAuthorized(long studentId);
-        Task UpdateStudent(Student student);
-        Task DeleteStudent(Student student);
+        Task AddStudentAsync(Student student);
+        Task<bool> CheckIfAuthorizedAsync(long studentId);
+        Task UpdateStudentAsync(Student student);
+        Task DeleteStudentAsync(Student student);
     }
 }

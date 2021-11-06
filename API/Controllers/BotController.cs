@@ -12,7 +12,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromServices] BotUpdateService service, [FromBody] Update update)
         {
-            await service.HandleUpdate(update);
+            await service.HandleUpdateAsync(update);
 
             return Ok();
         }

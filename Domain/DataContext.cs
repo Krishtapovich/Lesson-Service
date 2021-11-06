@@ -9,6 +9,10 @@ namespace Domain
         {
         }
 
+        protected DataContext()
+        {
+        }
+
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Group> Groups { get; set; }
@@ -18,7 +22,7 @@ namespace Domain
             base.OnModelCreating(builder);
 
             builder.Entity<Student>(m => m.Property(s => s.Id).ValueGeneratedOnAdd());
-            builder.Entity<Group>().HasMany(g => g.Students).WithOne(s => s.Group);
+            builder.Entity<Student>().HasOne(s => s.Group).WithMany(g => g.Students).HasForeignKey(s => s.GroupId);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Repositories.BotRepository
 {
@@ -13,28 +14,46 @@ namespace Domain.Repositories.BotRepository
             this.context = context;
         }
 
-        public async Task AddStudent(Student student)
+        public async Task AddStudentAsync(Student student)
         {
-            if (!context.Groups.Any(x => x.Number == student.Group.Number))
-                await context.Groups.AddAsync(student.Group);
+            var group = await GetGroupAsync(student);
+            group.Students.Add(student);
+            student.Group = group;
+
             await context.Students.AddAsync(student);
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> CheckIfAuthorized(long studentId)
+        public async Task<bool> CheckIfAuthorizedAsync(long studentId)
         {
-            var res = context.Students.Any(x => x.Id == studentId);
-            return res;
+            var student = await context.Students.FindAsync(studentId);
+            return student is not null;
         }
 
-        public async Task DeleteStudent(Student student)
+        public async Task DeleteStudentAsync(Student student)
         {
             throw new System.NotImplementedException();
         }
 
-        public async Task UpdateStudent(Student student)
+        public async Task UpdateStudentAsync(Student student)
         {
-            throw new System.NotImplementedException();
+            var oldStudent = await context.Students.FindAsync(student.Id);
+            var newGroup = await GetGroupAsync(student);
+            oldStudent.Group.Students.Remove(oldStudent);
+            oldStudent.FirstName = student.FirstName;
+            oldStudent.LastName = student.LastName;
+            oldStudent.Group = newGroup;
+            newGroup.Students.Add(oldStudent);
+
+            await context.SaveChangesAsync();
+        }
+
+        private async Task<Group> GetGroupAsync(Student student)
+        {
+            var group = await context.Groups.Where(g => g.Number == student.Group.Number).FirstOrDefaultAsync();
+            if (group is null)
+                group = (await context.Groups.AddAsync(student.Group)).Entity;
+            return group;
         }
     }
 }
