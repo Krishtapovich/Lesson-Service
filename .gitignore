@@ -5,6 +5,7 @@
 
 API/appsettings.Development.json
 API/appsettings.json
+API/lesson-service.db
 
 # User-specific files
 *.rsuser

@@ -13,12 +13,10 @@ namespace API
     public class Startup
     {
         private readonly IConfiguration configuration;
-        private readonly BotConfiguration botConfiguration;
 
         public Startup(IConfiguration configuration)
         {
             this.configuration = configuration;
-            botConfiguration = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -30,9 +28,9 @@ namespace API
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
-            }, ServiceLifetime.Singleton);
+            });
 
-            services.AddBotServices(botConfiguration);
+            services.AddBotServices(configuration);
             services.AddControllers().AddNewtonsoftJson();
         }
 

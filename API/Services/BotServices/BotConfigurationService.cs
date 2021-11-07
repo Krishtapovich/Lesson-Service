@@ -9,6 +9,12 @@ using Telegram.Bot.Types.Enums;
 
 namespace API.Services.BotServices
 {
+    public class BotConfiguration
+    {
+        public string Token { get; set; }
+        public string Host { get; set; }
+    }
+
     public class BotConfigurationService : IHostedService
     {
         private readonly IServiceProvider services;

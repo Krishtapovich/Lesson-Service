@@ -1,4 +1,4 @@
-namespace API.Constants
+namespace Application.Constants
 {
     public static class BotConstants
     {
