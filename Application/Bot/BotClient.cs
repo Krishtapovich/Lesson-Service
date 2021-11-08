@@ -2,6 +2,8 @@
 using Domain.Models.Student;
 using Domain.Models.Survey;
 using Domain.Repositories.StudentRepository;
+using Domain.Repositories.SurveyRepository;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -14,15 +16,25 @@ namespace Application.Bot
     {
         private readonly ITelegramBotClient bot;
         private readonly IStudentRepository studentRepository;
+        private readonly ISurveyRepository surveyRepository;
 
-        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository)
+        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository)
         {
             this.bot = bot;
             this.studentRepository = studentRepository;
+            this.surveyRepository = surveyRepository;
         }
 
-        public async Task UnknownMessageAsync(Message message) =>
-            await bot.SendTextMessageAsync(message.Chat.Id, BotConstants.Unknown, replyToMessageId: message.MessageId);
+        public async Task UnknownMessageAsync(Message message)
+        {
+
+        }
+
+        public async Task HandlePollAnswerAsync(Poll poll) =>
+            await (poll.TotalVoterCount == 0
+            ? surveyRepository.DeleteAnswerAsync(poll.Id)
+            : surveyRepository.RegisterAnswerAsync(poll.Id, poll.Options.First(o => o.VoterCount == 1).Text));
+
 
         public async Task HandleTextMessageAsync(Message message)
         {
@@ -35,18 +47,29 @@ namespace Application.Bot
             await action;
         }
 
-        public async Task SendSurveyAsync(Survey survey)
+        public async Task SendSurveyAsync(Survey surveyDto)
         {
-            var students = await studentRepository.GetGroupStudentsAsync(survey.GroupNumber);
+            var studentIds = surveyDto.StudentIds is null
+                ? await studentRepository.GetGroupStudentsIdsAsync(surveyDto.GroupNumber)
+                : surveyDto.StudentIds;
 
-            foreach (var student in students)
-                foreach (var question in survey.Questions)
-                    await bot.SendTextMessageAsync(student.Id, question.Text, replyMarkup: SetMarkup(question));
+            var survey = new Survey { Id = surveyDto.Id, GroupNumber = surveyDto.GroupNumber, Questions = new List<Question>() };
+
+            foreach (var studentId in studentIds)
+            {
+                foreach (var question in surveyDto.Questions)
+                {
+                    var pollOptions = question.Options.Select(o => o.Text);
+                    var message = await bot.SendPollAsync(studentId, question.Text, pollOptions, openPeriod: surveyDto.ActivePeriod);
+
+                    var questionOptions = question.Options.Select(o => new Option { Text = o.Text, IsCorrect = o.IsCorrect }).ToList();
+                    survey.Questions.Add(new Question { Id = message.Poll.Id, Text = question.Text, Options = questionOptions, StudentId = studentId });
+                }
+            }
+
+            await surveyRepository.AddSurveyAsync(survey);
         }
 
-        private InlineKeyboardMarkup SetMarkup(Question question) =>
-            new InlineKeyboardMarkup(question.Options.Select(o => InlineKeyboardButton.WithCallbackData(o.Text)));
-                
         private async Task GetDataAsync(long chatId, bool isUpdatingData)
         {
             var flag = !isUpdatingData && await studentRepository.CheckIfAuthorizedAsync(chatId);

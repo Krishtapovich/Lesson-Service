@@ -10,6 +10,6 @@ namespace Domain.Repositories.StudentRepository
         Task<bool> CheckIfAuthorizedAsync(long studentId);
         Task UpdateStudentAsync(Student student);
         Task DeleteStudentAsync(Student student);
-        Task<ICollection<Student>> GetGroupStudentsAsync(long groupNumber);
+        Task<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber);
     }
 }

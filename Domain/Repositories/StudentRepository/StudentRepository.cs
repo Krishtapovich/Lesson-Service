@@ -1,6 +1,7 @@
 using Domain.Models.Student;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Domain.Repositories.StudentRepository
@@ -56,7 +57,7 @@ namespace Domain.Repositories.StudentRepository
             return group;
         }
 
-        public async Task<ICollection<Student>> GetGroupStudentsAsync(long groupNumber) =>
-            (await context.Groups.Include(g => g.Students).FirstOrDefaultAsync(g => g.Number == groupNumber)).Students;
+        public async Task<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber) =>
+            (await context.Groups.Include(g => g.Students).FirstAsync(g => g.Number == groupNumber)).Students.Select(s => s.Id);
     }
 }

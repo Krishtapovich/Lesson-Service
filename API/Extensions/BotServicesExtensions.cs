@@ -1,5 +1,6 @@
 using API.Services.BotServices;
 using Domain.Repositories.StudentRepository;
+using Domain.Repositories.SurveyRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
@@ -18,6 +19,7 @@ namespace API.Extensions
                 .AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botConfiguration.Token, client));
 
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<ISurveyRepository, SurveyRepository>();
             services.AddScoped<BotService>();
 
             return services;

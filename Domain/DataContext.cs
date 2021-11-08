@@ -14,13 +14,13 @@ namespace Domain
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Option> Options { get; set; }
+        public DbSet<Answer> Answers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<Group>().HasMany(g => g.Students).WithOne();
-            builder.Entity<Student>(m => m.Property(s => s.Id).ValueGeneratedOnAdd());
 
             builder.Entity<Survey>().HasMany(s => s.Questions).WithOne();
             builder.Entity<Question>().HasMany(q => q.Options).WithOne();

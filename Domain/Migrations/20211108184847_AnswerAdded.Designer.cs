@@ -3,14 +3,16 @@ using System;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211108184847_AnswerAdded")]
+    partial class AnswerAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,9 +69,6 @@ namespace Domain.Migrations
                     b.Property<string>("QuestionId")
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("StudentId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Guid>("SurveyId")
                         .HasColumnType("TEXT");
 
@@ -107,9 +106,6 @@ namespace Domain.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
-
-                    b.Property<long>("StudentId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("SurveyId")
                         .HasColumnType("TEXT");
