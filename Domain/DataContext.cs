@@ -24,6 +24,7 @@ namespace Domain
 
             builder.Entity<Survey>().HasMany(s => s.Questions).WithOne();
             builder.Entity<Question>().HasMany(q => q.Options).WithOne();
+            builder.Entity<Question>().HasMany(q => q.Messages).WithOne();
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿using Application.Constants;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Application.Constants;
 using Domain.Models.Student;
 using Domain.Models.Survey;
 using Domain.Repositories.StudentRepository;
 using Domain.Repositories.SurveyRepository;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -30,44 +30,72 @@ namespace Application.Bot
 
         }
 
-        public async Task HandlePollAnswerAsync(Poll poll) =>
-            await (poll.TotalVoterCount == 0
-            ? surveyRepository.DeleteAnswerAsync(poll.Id)
-            : surveyRepository.RegisterAnswerAsync(poll.Id, poll.Options.First(o => o.VoterCount == 1).Text));
+        public async Task HandlePollAnswerAsync(Poll poll)
+        {
+            if (poll.TotalVoterCount == 1)
+            {
+                await surveyRepository.RegisterOptionAnswerAsync(long.Parse(poll.Id), poll.Options.First(o => o.VoterCount == 1).Text);
+            }
+        }
 
+        private async Task HandleReplyMessageAsync(Message message)
+        {
+            if (message.Photo is null)
+            {
+                await surveyRepository.RegisterTextAnswerAsync(message.MessageId, message.Text);
+            }
+            else
+            {
+
+            }
+        }
 
         public async Task HandleTextMessageAsync(Message message)
         {
-            var action = message.Text switch
+            if (message.ReplyToMessage is null)
             {
-                "/start" => GetDataAsync(message.Chat.Id, false),
-                "Update data" => GetDataAsync(message.Chat.Id, true),
-                _ => ParseDataAsync(message)
-            };
-            await action;
+                var action = message.Text switch
+                {
+                    "/start" => GetDataAsync(message.Chat.Id, false),
+                    "Update data" => GetDataAsync(message.Chat.Id, true),
+                    _ => ParseDataAsync(message)
+                };
+                await action;
+            }
+            else
+            {
+                await HandleReplyMessageAsync(message);
+            }
         }
 
-        public async Task SendSurveyAsync(Survey surveyDto)
+        public async Task SendSurveyToGroupAsync(Guid surveyId, long groupNumber)
         {
-            var studentIds = surveyDto.StudentIds is null
-                ? await studentRepository.GetGroupStudentsIdsAsync(surveyDto.GroupNumber)
-                : surveyDto.StudentIds;
-
-            var survey = new Survey { Id = surveyDto.Id, GroupNumber = surveyDto.GroupNumber, Questions = new List<Question>() };
+            var studentIds = await studentRepository.GetGroupStudentsIdsAsync(groupNumber);
+            var questions = await surveyRepository.GetSurveyQuestionsAsync(surveyId);
 
             foreach (var studentId in studentIds)
             {
-                foreach (var question in surveyDto.Questions)
+                foreach (var question in questions)
                 {
-                    var pollOptions = question.Options.Select(o => o.Text);
-                    var message = await bot.SendPollAsync(studentId, question.Text, pollOptions, openPeriod: surveyDto.ActivePeriod);
-
-                    var questionOptions = question.Options.Select(o => new Option { Text = o.Text, IsCorrect = o.IsCorrect }).ToList();
-                    survey.Questions.Add(new Question { Id = message.Poll.Id, Text = question.Text, Options = questionOptions, StudentId = studentId });
+                    var message = await SendQuestionAsync(studentId, question);
+                    var messageId = question.Options.Count == 0 ? message.MessageId : long.Parse(message.Poll.Id);
+                    var questionMessage = new QuestionMessage { MessageId = messageId, StudentId = studentId };
+                    await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
                 }
             }
+        }
 
-            await surveyRepository.AddSurveyAsync(survey);
+        private Task<Message> SendQuestionAsync(long chatId, Question question, int? openPeriod = null)
+        {
+            if (question.Options.Any())
+            {
+                var pollOptions = question.Options.Select(o => o.Text);
+                return bot.SendPollAsync(chatId, question.Text, pollOptions, openPeriod: openPeriod);
+            }
+            else
+            {
+                return bot.SendTextMessageAsync(chatId, question.Text);
+            }
         }
 
         private async Task GetDataAsync(long chatId, bool isUpdatingData)

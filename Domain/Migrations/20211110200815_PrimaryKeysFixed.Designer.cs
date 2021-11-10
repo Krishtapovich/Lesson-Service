@@ -3,14 +3,16 @@ using System;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211110200815_PrimaryKeysFixed")]
+    partial class PrimaryKeysFixed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,7 +66,7 @@ namespace Domain.Migrations
                     b.Property<int?>("OptionId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("QuestionId")
+                    b.Property<int>("QuestionId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("StudentId")
@@ -92,7 +94,7 @@ namespace Domain.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long?>("QuestionId")
+                    b.Property<int?>("QuestionId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")
@@ -107,7 +109,7 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -126,14 +128,14 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.QuestionMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
-                    b.Property<long>("MessageId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("MessageId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<long?>("QuestionId")
+                    b.Property<int?>("QuestionId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("StudentId")

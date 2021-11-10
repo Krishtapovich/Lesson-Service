@@ -31,7 +31,7 @@ namespace API.Services.BotServices
             using var scope = services.CreateScope();
             var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
 
-            var webhook = $"{configuration.Host}/api/Bot";
+            var webhook = $"{configuration.Host}/api/bot";
             await botClient.SetWebhookAsync(url: webhook, allowedUpdates: Array.Empty<UpdateType>(),
                                             cancellationToken: cancellationToken);
         }

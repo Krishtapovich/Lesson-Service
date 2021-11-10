@@ -4,10 +4,11 @@ namespace Domain.Models.Survey
 {
     public class Answer
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public long StudentId { get; set; }
         public Guid SurveyId { get; set; }
-        public string QuestionId { get; set; }
+        public long QuestionId { get; set; }
         public Option Option { get; set; }
+        public string Text { get; set; }
     }
 }

@@ -3,14 +3,16 @@ using System;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211110190442_RemoveStudentIdFromQuestion")]
+    partial class RemoveStudentIdFromQuestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -18,9 +20,9 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Student.Group", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("Number")
                         .HasColumnType("INTEGER");
@@ -39,8 +41,8 @@ namespace Domain.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("GroupNumber")
                         .HasColumnType("INTEGER");
@@ -57,15 +59,15 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Answer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("OptionId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid?>("OptionId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<long>("QuestionId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("StudentId")
                         .HasColumnType("INTEGER");
@@ -85,15 +87,15 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Option", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long?>("QuestionId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
                         .HasColumnType("TEXT");
@@ -107,9 +109,9 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("SurveyId")
                         .HasColumnType("TEXT");
@@ -126,15 +128,15 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.QuestionMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
-                    b.Property<long>("MessageId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("MessageId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<long?>("QuestionId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("StudentId")
                         .HasColumnType("INTEGER");
@@ -151,6 +153,9 @@ namespace Domain.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
+
+                    b.Property<long>("GroupNumber")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

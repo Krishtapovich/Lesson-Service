@@ -1,7 +1,9 @@
-﻿using Domain.Models.Survey;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Models.Survey;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Repositories.SurveyRepository
 {
@@ -20,20 +22,73 @@ namespace Domain.Repositories.SurveyRepository
             await context.SaveChangesAsync();
         }
 
-        public async Task RegisterAnswerAsync(string questionId, string optionText)
+        private async Task<(Survey survey, Question question, Answer answer)> GetSurveyTupleAsync(long questionId)
         {
             var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == questionId);
-            var option = question.Options.First(o => o.Text == optionText);
-            var survey = await context.Surveys.Where(s => s.Questions.Contains(question)).FirstAsync();
-            var answer = new Answer { SurveyId = survey.Id, QuestionId = question.Id, Option = option, StudentId = question.StudentId };
-            await context.Answers.AddAsync(answer);
+            var survey = await context.Surveys.FirstAsync(s => s.Questions.Contains(question));
+            var answer = await context.Answers.FirstOrDefaultAsync(a => a.QuestionId == questionId);
+            return (survey, question, answer);
+        }
+
+        public async Task<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId)
+        {
+            var survey = await context.Surveys.Include(s => s.Questions).ThenInclude(q => q.Options).FirstAsync(s => s.Id == surveyId);
+            return survey.Questions;
+        }
+
+        public async Task AddQuestionMessageAsync(long questionId, QuestionMessage message)
+        {
+            var question = await context.Questions.Include(q => q.Messages).FirstAsync(q => q.Id == questionId);
+            if (question.Messages is null)
+            {
+                question.Messages = new List<QuestionMessage> { message };
+            }
+            else
+            {
+                question.Messages.Add(message);
+            }
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteAnswerAsync(string questionId)
+        public async Task RegisterOptionAnswerAsync(long questionId, string optionText)
         {
-            var answer = await context.Answers.Where(a => a.QuestionId == questionId).FirstAsync();
-            context.Answers.Remove(answer);
+            var tuple = await GetSurveyTupleAsync(questionId);
+            var option = tuple.question.Options.First(o => o.Text == optionText);
+            if (tuple.answer is null)
+            {
+                tuple.answer = new Answer
+                {
+                    SurveyId = tuple.survey.Id,
+                    QuestionId = tuple.question.Id,
+                    StudentId = tuple.question.Messages.First(m => m.MessageId == questionId).StudentId,
+                    Option = option
+                };
+                await context.Answers.AddAsync(tuple.answer);
+            }
+            else
+            {
+                tuple.answer.Option = option;
+            }
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RegisterTextAnswerAsync(long questionId, string text)
+        {
+            var tuple = await GetSurveyTupleAsync(questionId);
+            if (tuple.answer is null)
+            {
+                tuple.answer = new Answer
+                {
+                    SurveyId = tuple.survey.Id,
+                    QuestionId = tuple.question.Id,
+                    StudentId = tuple.question.Messages.First(m => m.MessageId == questionId).StudentId,
+                    Text = text
+                };
+            }
+            else
+            {
+                tuple.answer.Text = text;
+            }
             await context.SaveChangesAsync();
         }
     }

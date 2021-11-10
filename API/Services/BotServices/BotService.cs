@@ -1,8 +1,8 @@
+using System;
+using System.Threading.Tasks;
 using Application.Bot;
-using Domain.Models.Survey;
 using Domain.Repositories.StudentRepository;
 using Domain.Repositories.SurveyRepository;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -30,12 +30,13 @@ namespace API.Services.BotServices
                 };
                 await handler;
             }
-            catch
+            catch (Exception ex)
             {
                 await botClient.UnknownMessageAsync(update.Message);
             }
         }
 
-        public async Task SendSurveyAsync(Survey survey) => await botClient.SendSurveyAsync(survey);
+        public async Task SendSurveyToGroupAsync(Guid surveyId, long groupNumber) =>
+            await botClient.SendSurveyToGroupAsync(surveyId, groupNumber);
     }
 }

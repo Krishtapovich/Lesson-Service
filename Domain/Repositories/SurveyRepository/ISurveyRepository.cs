@@ -1,12 +1,16 @@
-﻿using Domain.Models.Survey;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Models.Survey;
 
 namespace Domain.Repositories.SurveyRepository
 {
     public interface ISurveyRepository
     {
         Task AddSurveyAsync(Survey survey);
-        Task RegisterAnswerAsync(string questionId, string optionText);
-        Task DeleteAnswerAsync(string questionId);
+        Task RegisterOptionAnswerAsync(long questionId, string optionText);
+        Task RegisterTextAnswerAsync(long questionId, string text);
+        Task<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId);
+        Task AddQuestionMessageAsync(long questionId, QuestionMessage message);
     }
 }

@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/bot")]
     public class BotController : Controller
     {
         [HttpPost]
