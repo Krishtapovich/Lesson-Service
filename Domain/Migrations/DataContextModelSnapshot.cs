@@ -64,10 +64,7 @@ namespace Domain.Migrations
                     b.Property<int?>("OptionId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("QuestionId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("StudentId")
+                    b.Property<int>("QuestionMessageId")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("SurveyId")
@@ -79,6 +76,9 @@ namespace Domain.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OptionId");
+
+                    b.HasIndex("QuestionMessageId")
+                        .IsUnique();
 
                     b.ToTable("Answers");
                 });
@@ -143,7 +143,7 @@ namespace Domain.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("QuestionMessage");
+                    b.ToTable("QuestionMessages");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Survey", b =>
@@ -170,28 +170,41 @@ namespace Domain.Migrations
                         .WithMany()
                         .HasForeignKey("OptionId");
 
+                    b.HasOne("Domain.Models.Survey.QuestionMessage", "QuestionMessage")
+                        .WithOne()
+                        .HasForeignKey("Domain.Models.Survey.Answer", "QuestionMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Option");
+
+                    b.Navigation("QuestionMessage");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Option", b =>
                 {
                     b.HasOne("Domain.Models.Survey.Question", null)
                         .WithMany("Options")
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>
                 {
                     b.HasOne("Domain.Models.Survey.Survey", null)
                         .WithMany("Questions")
-                        .HasForeignKey("SurveyId");
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.QuestionMessage", b =>
                 {
-                    b.HasOne("Domain.Models.Survey.Question", null)
+                    b.HasOne("Domain.Models.Survey.Question", "Question")
                         .WithMany("Messages")
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("Domain.Models.Student.Group", b =>

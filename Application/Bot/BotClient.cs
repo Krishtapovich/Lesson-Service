@@ -25,24 +25,26 @@ namespace Application.Bot
             this.surveyRepository = surveyRepository;
         }
 
-        public async Task UnknownMessageAsync(Message message)
+        public async ValueTask UnknownMessageAsync(Message message)
         {
 
         }
 
-        public async Task HandlePollAnswerAsync(Poll poll)
+        public async ValueTask HandlePollAnswerAsync(Poll poll)
         {
             if (poll.TotalVoterCount == 1)
             {
-                await surveyRepository.RegisterOptionAnswerAsync(long.Parse(poll.Id), poll.Options.First(o => o.VoterCount == 1).Text);
+                var text = poll.Options.First(o => o.VoterCount == 1).Text;
+                await surveyRepository.RegisterOptionAnswerAsync(long.Parse(poll.Id), text);
             }
         }
 
-        private async Task HandleReplyMessageAsync(Message message)
+        private async ValueTask HandleReplyMessageAsync(Message message)
         {
-            if (message.Photo is null)
+            var question = message.ReplyToMessage;
+            if (message.Text is not null)
             {
-                await surveyRepository.RegisterTextAnswerAsync(message.MessageId, message.Text);
+                await surveyRepository.RegisterTextAnswerAsync(question.MessageId, message.Text);
             }
             else
             {
@@ -50,7 +52,7 @@ namespace Application.Bot
             }
         }
 
-        public async Task HandleTextMessageAsync(Message message)
+        public async ValueTask HandleTextMessageAsync(Message message)
         {
             if (message.ReplyToMessage is null)
             {
@@ -77,35 +79,36 @@ namespace Application.Bot
             {
                 foreach (var question in questions)
                 {
-                    var message = await SendQuestionAsync(studentId, question);
-                    var messageId = question.Options.Count == 0 ? message.MessageId : long.Parse(message.Poll.Id);
-                    var questionMessage = new QuestionMessage { MessageId = messageId, StudentId = studentId };
+                    var messageId = await SendQuestionAsync(studentId, question);
+                    var questionMessage = new QuestionMessage { MessageId = messageId, StudentId = studentId, Question = question };
                     await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
                 }
             }
         }
 
-        private Task<Message> SendQuestionAsync(long chatId, Question question, int? openPeriod = null)
+        private async ValueTask<long> SendQuestionAsync(long chatId, Question question, int? openPeriod = null)
         {
+            Message message;
             if (question.Options.Any())
             {
                 var pollOptions = question.Options.Select(o => o.Text);
-                return bot.SendPollAsync(chatId, question.Text, pollOptions, openPeriod: openPeriod);
+                message = await bot.SendPollAsync(chatId, question.Text, pollOptions, openPeriod: openPeriod);
             }
             else
             {
-                return bot.SendTextMessageAsync(chatId, question.Text);
+                message = await bot.SendTextMessageAsync(chatId, question.Text);
             }
+            return question.Options.Count == 0 ? message.MessageId : long.Parse(message.Poll.Id);
         }
 
-        private async Task GetDataAsync(long chatId, bool isUpdatingData)
+        private async ValueTask GetDataAsync(long chatId, bool isUpdatingData)
         {
             var flag = !isUpdatingData && await studentRepository.CheckIfAuthorizedAsync(chatId);
             await (flag ? bot.SendTextMessageAsync(chatId, BotConstants.Authorized)
                         : bot.SendTextMessageAsync(chatId, BotConstants.ReceiveData));
         }
 
-        private async Task ParseDataAsync(Message message)
+        private async ValueTask ParseDataAsync(Message message)
         {
             var data = message.Text.Split("\n");
             var student = new Student

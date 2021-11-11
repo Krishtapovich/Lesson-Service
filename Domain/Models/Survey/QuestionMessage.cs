@@ -5,5 +5,6 @@
         public int Id { get; set; }
         public long MessageId { get; set; }
         public long StudentId { get; set; }
+        public Question Question { get; set; }
     }
 }

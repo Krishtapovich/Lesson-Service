@@ -1,4 +1,5 @@
 using API.Extensions;
+using Application.MappingProfiles;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,7 @@ namespace API
             });
 
             services.AddBotServices(configuration);
+            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddControllers().AddNewtonsoftJson();
         }
 

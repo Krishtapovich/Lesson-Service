@@ -8,9 +8,10 @@ namespace Domain.Repositories.SurveyRepository
     public interface ISurveyRepository
     {
         Task AddSurveyAsync(Survey survey);
-        Task RegisterOptionAnswerAsync(long questionId, string optionText);
-        Task RegisterTextAnswerAsync(long questionId, string text);
-        Task<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId);
-        Task AddQuestionMessageAsync(long questionId, QuestionMessage message);
+        Task DeleteSurveyAsync(Guid surveyId);
+        ValueTask RegisterOptionAnswerAsync(long messageId, string optionText);
+        ValueTask RegisterTextAnswerAsync(long messageId, string text);
+        ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId);
+        ValueTask AddQuestionMessageAsync(long questionId, QuestionMessage message);
     }
 }

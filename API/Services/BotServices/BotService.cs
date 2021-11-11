@@ -18,7 +18,7 @@ namespace API.Services.BotServices
             botClient = new BotClient(bot, studentRepository, surveyRepository);
         }
 
-        public async Task HandleUpdateAsync(Update update)
+        public async ValueTask HandleUpdateAsync(Update update)
         {
             try
             {

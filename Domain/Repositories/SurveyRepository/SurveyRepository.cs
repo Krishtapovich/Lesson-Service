@@ -22,21 +22,20 @@ namespace Domain.Repositories.SurveyRepository
             await context.SaveChangesAsync();
         }
 
-        private async Task<(Survey survey, Question question, Answer answer)> GetSurveyTupleAsync(long questionId)
+        public async Task DeleteSurveyAsync(Guid surveyId)
         {
-            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == questionId);
-            var survey = await context.Surveys.FirstAsync(s => s.Questions.Contains(question));
-            var answer = await context.Answers.FirstOrDefaultAsync(a => a.QuestionId == questionId);
-            return (survey, question, answer);
+            var survey = await context.Surveys.FindAsync(surveyId);
+            context.Surveys.Remove(survey);
+            await context.SaveChangesAsync();
         }
 
-        public async Task<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId)
+        public async ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId)
         {
             var survey = await context.Surveys.Include(s => s.Questions).ThenInclude(q => q.Options).FirstAsync(s => s.Id == surveyId);
             return survey.Questions;
         }
 
-        public async Task AddQuestionMessageAsync(long questionId, QuestionMessage message)
+        public async ValueTask AddQuestionMessageAsync(long questionId, QuestionMessage message)
         {
             var question = await context.Questions.Include(q => q.Messages).FirstAsync(q => q.Id == questionId);
             if (question.Messages is null)
@@ -50,7 +49,7 @@ namespace Domain.Repositories.SurveyRepository
             await context.SaveChangesAsync();
         }
 
-        public async Task RegisterOptionAnswerAsync(long questionId, string optionText)
+        public async ValueTask RegisterOptionAnswerAsync(long questionId, string optionText)
         {
             var tuple = await GetSurveyTupleAsync(questionId);
             var option = tuple.question.Options.First(o => o.Text == optionText);
@@ -58,9 +57,8 @@ namespace Domain.Repositories.SurveyRepository
             {
                 tuple.answer = new Answer
                 {
-                    SurveyId = tuple.survey.Id,
-                    QuestionId = tuple.question.Id,
-                    StudentId = tuple.question.Messages.First(m => m.MessageId == questionId).StudentId,
+                    SurveyId = tuple.surveyId,
+                    QuestionMessage = tuple.questionMessage,
                     Option = option
                 };
                 await context.Answers.AddAsync(tuple.answer);
@@ -72,18 +70,27 @@ namespace Domain.Repositories.SurveyRepository
             await context.SaveChangesAsync();
         }
 
-        public async Task RegisterTextAnswerAsync(long questionId, string text)
+        private async ValueTask<(Guid surveyId, Question question, Answer answer, QuestionMessage questionMessage)> GetSurveyTupleAsync(long messageId)
         {
-            var tuple = await GetSurveyTupleAsync(questionId);
+            var questionMessage = await context.QuestionMessages.FirstAsync(qm => qm.MessageId == messageId);
+            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Messages.Contains(questionMessage));
+            var survey = await context.Surveys.FirstAsync(s => s.Questions.Contains(question));
+            var answer = await context.Answers.FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
+            return (survey.Id, question, answer, questionMessage);
+        }
+
+        public async ValueTask RegisterTextAnswerAsync(long messageId, string text)
+        {
+            var tuple = await GetSurveyTupleAsync(messageId);
             if (tuple.answer is null)
             {
                 tuple.answer = new Answer
                 {
-                    SurveyId = tuple.survey.Id,
-                    QuestionId = tuple.question.Id,
-                    StudentId = tuple.question.Messages.First(m => m.MessageId == questionId).StudentId,
+                    SurveyId = tuple.surveyId,
+                    QuestionMessage = tuple.questionMessage,
                     Text = text
                 };
+                await context.Answers.AddAsync(tuple.answer);
             }
             else
             {

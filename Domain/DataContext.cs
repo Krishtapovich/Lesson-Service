@@ -13,6 +13,7 @@ namespace Domain
 
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<QuestionMessage> QuestionMessages { get; set; }
         public DbSet<Option> Options { get; set; }
         public DbSet<Answer> Answers { get; set; }
 
@@ -22,9 +23,10 @@ namespace Domain
 
             builder.Entity<Group>().HasMany(g => g.Students).WithOne();
 
-            builder.Entity<Survey>().HasMany(s => s.Questions).WithOne();
-            builder.Entity<Question>().HasMany(q => q.Options).WithOne();
-            builder.Entity<Question>().HasMany(q => q.Messages).WithOne();
+            builder.Entity<Survey>().HasMany(s => s.Questions).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Question>().HasMany(q => q.Options).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Question>().HasMany(q => q.Messages).WithOne(qm => qm.Question).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Answer>().HasOne(a => a.QuestionMessage).WithOne().HasForeignKey<Answer>(a => a.QuestionMessageId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

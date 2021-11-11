@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using API.Services.BotServices;
+using AutoMapper;
 using Domain.Models.Survey;
 using Domain.Repositories.SurveyRepository;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ namespace API.Controllers
     {
         private readonly BotService service;
         private readonly ISurveyRepository repository;
+        private readonly IMapper mapper;
 
-        public InstructorController(BotService service, ISurveyRepository repository)
+        public InstructorController(BotService service, ISurveyRepository repository, IMapper mapper)
         {
             this.service = service;
             this.repository = repository;
+            this.mapper = mapper;
         }
 
         [HttpPost("send-survey-to-group")]
@@ -28,11 +31,17 @@ namespace API.Controllers
         }
 
         [HttpPost("create-survey")]
-        public async Task<IActionResult> CreateSurveyAsync(Survey survey)
+        public async Task<IActionResult> CreateSurveyAsync(SurveyDto survey)
         {
-            await repository.AddSurveyAsync(survey);
+            await repository.AddSurveyAsync(mapper.Map<Survey>(survey));
             return Ok();
         }
 
+        [HttpDelete("delete-survey")]
+        public async Task<IActionResult> DeleteSurveyAsync(Guid surveyId)
+        {
+            await repository.DeleteSurveyAsync(surveyId);
+            return Ok();
+        }
     }
 }

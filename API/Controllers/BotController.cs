@@ -10,7 +10,7 @@ namespace API.Controllers
     public class BotController : Controller
     {
         [HttpPost]
-        public async Task<IActionResult> Post([FromServices] BotService service, [FromBody] Update update)
+        public async ValueTask<IActionResult> Post([FromServices] BotService service, [FromBody] Update update)
         {
             await service.HandleUpdateAsync(update);
 
