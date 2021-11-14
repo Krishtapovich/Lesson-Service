@@ -3,14 +3,16 @@ using System;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211112183442_AnswerUrlAdded")]
+    partial class AnswerUrlAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,7 +94,7 @@ namespace Domain.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("QuestionId")
+                    b.Property<long?>("QuestionId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")
@@ -107,7 +109,7 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -133,7 +135,7 @@ namespace Domain.Migrations
                     b.Property<long>("MessageId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("QuestionId")
+                    b.Property<long?>("QuestionId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("StudentId")
@@ -151,9 +153,6 @@ namespace Domain.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsClosed")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

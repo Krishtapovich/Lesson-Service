@@ -22,6 +22,9 @@ namespace API.Extensions
             services.AddScoped<ISurveyRepository, SurveyRepository>();
             services.AddScoped<BotService>();
 
+            services.AddSingleton<TimerService>();
+            services.AddHostedService(provider => provider.GetService<TimerService>());
+
             return services;
         }
     }

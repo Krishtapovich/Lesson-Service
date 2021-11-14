@@ -1,4 +1,6 @@
 using API.Extensions;
+using API.Services.BotServices;
+using Application.Cloud;
 using Application.MappingProfiles;
 using Domain;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +35,8 @@ namespace API
 
             services.AddBotServices(configuration);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.AddScoped<IImageCloud, ImageCloud>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("CloudConfiguration"));
             services.AddControllers().AddNewtonsoftJson();
         }
 

@@ -9,9 +9,10 @@ namespace Domain.Repositories.SurveyRepository
     {
         Task AddSurveyAsync(Survey survey);
         Task DeleteSurveyAsync(Guid surveyId);
-        ValueTask RegisterOptionAnswerAsync(long messageId, string optionText);
-        ValueTask RegisterTextAnswerAsync(long messageId, string text);
+        Task ChangeSurveyStatusAsync(Guid surveyId, bool isClosed);
+        ValueTask<bool> GetSurveyStatusAsync(Guid survey);
+        ValueTask RegisterAnswerAsync(long messageId, string answerText = null, string optionText = null);
         ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId);
-        ValueTask AddQuestionMessageAsync(long questionId, QuestionMessage message);
+        ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Application.Bot;
+using Application.Cloud;
 using Domain.Repositories.StudentRepository;
 using Domain.Repositories.SurveyRepository;
 using Telegram.Bot;
@@ -13,9 +14,10 @@ namespace API.Services.BotServices
     {
         private readonly BotClient botClient;
 
-        public BotService(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository)
+        public BotService(ITelegramBotClient bot, IStudentRepository studentRepository,
+            ISurveyRepository surveyRepository, IImageCloud cloud)
         {
-            botClient = new BotClient(bot, studentRepository, surveyRepository);
+            botClient = new BotClient(bot, studentRepository, surveyRepository, cloud);
         }
 
         public async ValueTask HandleUpdateAsync(Update update)
@@ -36,7 +38,7 @@ namespace API.Services.BotServices
             }
         }
 
-        public async Task SendSurveyToGroupAsync(Guid surveyId, long groupNumber) =>
-            await botClient.SendSurveyToGroupAsync(surveyId, groupNumber);
+        public async Task SendSurveyToGroupAsync(Guid surveyId, long groupNumber, int? openPeriod = null) =>
+            await botClient.SendSurveyToGroupAsync(surveyId, groupNumber, openPeriod);
     }
 }
