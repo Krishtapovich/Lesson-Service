@@ -4,11 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Repositories.SurveyRepository;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
-namespace API.Services.BotServices
+namespace API.Services.TimerService
 {
-    public class TimerService : IHostedService
+    public class TimerService : ITimerService
     {
         private Dictionary<Guid, Timer> timers;
         private readonly ISurveyRepository repository;
@@ -25,7 +24,7 @@ namespace API.Services.BotServices
         }
 
         public Task AddTimerAsync(Guid surveyId, int period)
-        {            
+        {
             timers.Add(surveyId, new Timer(DoWork, surveyId, TimeSpan.FromSeconds(period), TimeSpan.Zero));
             return Task.CompletedTask;
         }

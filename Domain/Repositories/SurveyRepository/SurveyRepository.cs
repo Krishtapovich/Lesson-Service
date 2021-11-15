@@ -22,10 +22,10 @@ namespace Domain.Repositories.SurveyRepository
             await context.SaveChangesAsync();
         }
 
-        public async Task ChangeSurveyStatusAsync(Guid surveyId, bool isClosed)
+        public async Task ChangeSurveyStatusAsync(Guid surveyId, bool isOpened)
         {
             var survey = await context.Surveys.FindAsync(surveyId);
-            survey.IsClosed = isClosed;
+            survey.IsClosed = !isOpened;
             await context.SaveChangesAsync();
         }
 
@@ -63,8 +63,14 @@ namespace Domain.Repositories.SurveyRepository
             var questionMessage = await context.QuestionMessages.FirstAsync(qm => qm.MessageId == messageId);
             var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Messages.Contains(questionMessage));
             var survey = await context.Surveys.FirstAsync(s => s.Questions.Contains(question));
+            if(survey.IsClosed)
+            {
+                var exception = new Exception("Survey is closed, your answer wasn't registered");
+                exception.Data.Add("chatId", questionMessage.StudentId);
+                throw exception;
+            }
             var answer = await context.Answers.FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
-            var option = question.Options.First(o => o.Text == optionText);
+            var option = question.Options.FirstOrDefault(o => o.Text == optionText);
 
             if (answer is null)
             {

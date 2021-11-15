@@ -9,7 +9,7 @@ namespace Domain.Repositories.SurveyRepository
     {
         Task AddSurveyAsync(Survey survey);
         Task DeleteSurveyAsync(Guid surveyId);
-        Task ChangeSurveyStatusAsync(Guid surveyId, bool isClosed);
+        Task ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
         ValueTask<bool> GetSurveyStatusAsync(Guid survey);
         ValueTask RegisterAnswerAsync(long messageId, string answerText = null, string optionText = null);
         ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId);

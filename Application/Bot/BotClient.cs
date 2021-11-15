@@ -21,8 +21,7 @@ namespace Application.Bot
         private readonly ISurveyRepository surveyRepository;
         private readonly IImageCloud cloud;
 
-        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository,
-            ISurveyRepository surveyRepository, IImageCloud cloud)
+        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository, IImageCloud cloud)
         {
             this.bot = bot;
             this.studentRepository = studentRepository;
@@ -30,65 +29,81 @@ namespace Application.Bot
             this.cloud = cloud;
         }
 
-        public async ValueTask UnknownMessageAsync(Message message)
-        {
-
-        }
-
         public async ValueTask HandlePollAnswerAsync(Poll poll)
         {
-            if (poll.TotalVoterCount == 1)
+            try
             {
-                var text = poll.Options.First(o => o.VoterCount == 1).Text;
-                await surveyRepository.RegisterAnswerAsync(long.Parse(poll.Id), optionText: text);
+                if (poll.TotalVoterCount == 1)
+                {
+                    var text = poll.Options.First(o => o.VoterCount == 1).Text;
+                    await surveyRepository.RegisterAnswerAsync(long.Parse(poll.Id), optionText: text);
+                }
+            }
+            catch (Exception ex)
+            {
+                await bot.SendTextMessageAsync(ex.Data["chatId"].ToString(), ex.Message);
             }
         }
 
         private async ValueTask HandleReplyMessageAsync(Message message)
         {
-            var question = message.ReplyToMessage;
-            if (message.Text is not null)
+            try
             {
-                await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: message.Text);
+                var question = message.ReplyToMessage;
+                if (message.Text is not null)
+                {
+                    await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: message.Text);
+                }
+                else
+                {
+                    var file = await bot.GetFileAsync(message.Photo.Last().FileId);
+                    using var stream = new MemoryStream();
+                    await bot.DownloadFileAsync(file.FilePath, stream);
+                    var imageUrl = await cloud.AddImageAsync(file.FilePath, stream.ToArray());
+                    await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: imageUrl);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var file = await bot.GetFileAsync(message.Photo.Last().FileId);
-                using var stream = new MemoryStream();
-                await bot.DownloadFileAsync(file.FilePath, stream);
-                var imageUrl = await cloud.AddImageAsync(file.FilePath, stream.ToArray());
-                await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: imageUrl);
+                await bot.SendTextMessageAsync(ex.Data["chatId"].ToString(), ex.Message);
             }
         }
 
         public async ValueTask HandleTextMessageAsync(Message message)
         {
-            if (message.ReplyToMessage is null)
+            try
             {
-                var action = message.Text switch
+                if (message.ReplyToMessage is null)
                 {
-                    "/start" => GetDataAsync(message.Chat.Id, false),
-                    "Update data" => GetDataAsync(message.Chat.Id, true),
-                    _ => ParseDataAsync(message)
-                };
-                await action;
+                    var action = message.Text switch
+                    {
+                        "/start" => GetDataAsync(message.Chat.Id, false),
+                        "Update data" => GetDataAsync(message.Chat.Id, true),
+                        _ => ParseDataAsync(message)
+                    };
+                    await action;
+                }
+                else
+                {
+                    await HandleReplyMessageAsync(message);
+                }
             }
-            else
+            catch (Exception)
             {
-                await HandleReplyMessageAsync(message);
+                await bot.SendTextMessageAsync(message.Chat.Id, BotConstants.Unknown);
             }
         }
 
-        public async Task SendSurveyToGroupAsync(Guid surveyId, long groupNumber, int? openPeriod = null)
+        public async Task SendSurveyToGroupAsync(SurveyToGroup survey)
         {
-            var studentIds = await studentRepository.GetGroupStudentsIdsAsync(groupNumber);
-            var questions = await surveyRepository.GetSurveyQuestionsAsync(surveyId);
+            var studentIds = await studentRepository.GetGroupStudentsIdsAsync(survey.GroupNumber);
+            var questions = await surveyRepository.GetSurveyQuestionsAsync(survey.Id);
 
             foreach (var studentId in studentIds)
             {
                 foreach (var question in questions)
                 {
-                    var messageId = await SendQuestionAsync(studentId, question, openPeriod);
+                    var messageId = await SendQuestionAsync(studentId, question, survey.OpenPeriod);
                     var questionMessage = new QuestionMessage { MessageId = messageId, StudentId = studentId, Question = question };
                     await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
                 }

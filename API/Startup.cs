@@ -1,7 +1,4 @@
 using API.Extensions;
-using API.Services.BotServices;
-using Application.Cloud;
-using Application.MappingProfiles;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,11 +30,7 @@ namespace API
                 opt.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddBotServices(configuration);
-            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
-            services.AddScoped<IImageCloud, ImageCloud>();
-            services.Configure<CloudinarySettings>(configuration.GetSection("CloudConfiguration"));
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddAppServices(configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

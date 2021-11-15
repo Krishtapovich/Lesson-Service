@@ -1,9 +1,9 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -15,12 +15,12 @@ namespace API.Services.BotServices
         public string Host { get; set; }
     }
 
-    public class BotConfigurationService : IHostedService
+    public class ConfigurationService : IHostedService
     {
         private readonly IServiceProvider services;
         private readonly BotConfiguration configuration;
 
-        public BotConfigurationService(IServiceProvider serviceProvider, IConfiguration configuration)
+        public ConfigurationService(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             services = serviceProvider;
             this.configuration = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
@@ -31,7 +31,7 @@ namespace API.Services.BotServices
             using var scope = services.CreateScope();
             var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
 
-            var webhook = $"{configuration.Host}/api/bot";
+            var webhook = $"{configuration.Host}/bot";
             await botClient.SetWebhookAsync(url: webhook, allowedUpdates: Array.Empty<UpdateType>(),
                                             cancellationToken: cancellationToken);
         }

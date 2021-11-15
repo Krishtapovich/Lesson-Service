@@ -15,4 +15,11 @@ namespace Domain.Models.Survey
         public Guid Id { get; set; }
         public ICollection<QuestionDto> Questions { get; set; }
     }
+
+    public class SurveyToGroup
+    {
+        public Guid Id { get; set; }
+        public long GroupNumber { get; set; }
+        public int? OpenPeriod { get; set; }
+    }
 }

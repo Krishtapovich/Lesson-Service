@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using API.Services.BotServices;
-using AutoMapper;
+using API.Services.BotServices.MessageService;
+using API.Services.InstructorService;
+using API.Services.TimerService;
 using Domain.Models.Survey;
-using Domain.Repositories.SurveyRepository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -12,43 +12,47 @@ namespace API.Controllers
     [Route("api/instructor")]
     public class InstructorController : Controller
     {
-        private readonly BotService service;
-        private readonly ISurveyRepository repository;
-        private readonly IMapper mapper;
-        private readonly TimerService timerService;
+        private readonly IMessageService botService;
+        private readonly ITimerService timerService;
+        private readonly IInstructorService instructorService;
 
-        public InstructorController(BotService service, ISurveyRepository repository,
-            IMapper mapper, TimerService timerService)
+        public InstructorController(IMessageService botService, ITimerService timerService, IInstructorService instructorService)
         {
-            this.service = service;
-            this.repository = repository;
-            this.mapper = mapper;
+            this.botService = botService;
             this.timerService = timerService;
+            this.instructorService = instructorService;
         }
 
-        [HttpPost("send-survey-to-group")]
-        public async Task<IActionResult> SendSurveyToGroupAsync(Guid surveyId, long groupNumber, int? openPeriod = null)
+        [HttpPost("create-survey")]
+        public async Task<IActionResult> CreateSurveyAsync([FromBody] SurveyDto survey)
         {
-            await service.SendSurveyToGroupAsync(surveyId, groupNumber, openPeriod);
-            if (openPeriod is not null)
+            await instructorService.CreateSurveyAsync(survey);
+            return Ok();
+        }
+
+        [HttpPost("send-survey")]
+        public async Task<IActionResult> SendSurveyAsync([FromBody] SurveyToGroup survey)
+        {
+            await botService.SendSurveyAsync(survey);
+            await instructorService.ChangeSurveyStatusAsync(survey.Id, true);
+            if (survey.OpenPeriod is not null)
             {
-                await repository.ChangeSurveyStatusAsync(surveyId, true);
-                await timerService.AddTimerAsync(surveyId, openPeriod.Value);
+                await timerService.AddTimerAsync(survey.Id, survey.OpenPeriod.Value);
             }
             return Ok();
         }
 
-        [HttpPost("create-survey")]
-        public async Task<IActionResult> CreateSurveyAsync(SurveyDto survey)
+        [HttpPut("close-survey")]
+        public async Task<IActionResult> CloseSurveyAsync(Guid surveyId)
         {
-            await repository.AddSurveyAsync(mapper.Map<Survey>(survey));
+            await instructorService.ChangeSurveyStatusAsync(surveyId, false);
             return Ok();
         }
 
         [HttpDelete("delete-survey")]
         public async Task<IActionResult> DeleteSurveyAsync(Guid surveyId)
         {
-            await repository.DeleteSurveyAsync(surveyId);
+            await instructorService.DeleteSurveyAsync(surveyId);
             return Ok();
         }
     }
