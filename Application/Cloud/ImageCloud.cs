@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Domain.Models.Survey;
 using Microsoft.Extensions.Options;
 
 namespace Application.Cloud
@@ -16,7 +17,7 @@ namespace Application.Cloud
             cloudinary = new Cloudinary(account);
         }
 
-        public async ValueTask<string> AddImageAsync(string name, byte[] file)
+        public async ValueTask<Image> AddImageAsync(string name, byte[] file)
         {
             var stream = new MemoryStream(file);
             var uploadParams = new ImageUploadParams
@@ -27,7 +28,13 @@ namespace Application.Cloud
             var result = await cloudinary.UploadAsync(uploadParams);
             await stream.DisposeAsync();
 
-            return result.SecureUrl.ToString();
+            return new Image { CloudId = result.PublicId, Url = result.Url.ToString() }; 
+        }
+
+        public async ValueTask DeleteImageAsync(string id)
+        {
+            var deleteParams = new DeletionParams(id);
+            await cloudinary.DestroyAsync(deleteParams);
         }
     }
 }

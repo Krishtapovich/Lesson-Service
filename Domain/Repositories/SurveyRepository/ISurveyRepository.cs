@@ -7,12 +7,27 @@ namespace Domain.Repositories.SurveyRepository
 {
     public interface ISurveyRepository
     {
-        Task AddSurveyAsync(Survey survey);
-        Task DeleteSurveyAsync(Guid surveyId);
-        Task ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
+        ValueTask<IEnumerable<Survey>> GetSurveysAsync(int pageNumber, int pageSize);
+        ValueTask AddSurveyAsync(Survey survey);
+        ValueTask DeleteSurveyAsync(Guid surveyId);
+
+        ValueTask<bool> CheckIfSurveyClosedAsync(int messageId);
+        ValueTask<bool> CheckIfSurveyClosedAsync(string pollId);
+
+        ValueTask<IEnumerable<Image>> GetSurveyImagesAsync(Guid surveyId);
+        ValueTask<IEnumerable<QuestionMessage>> GetSurveyMessagesAsync(Guid surveyId);
+
+        ValueTask<Image> GetMessageImageAsync(int messageId);
+
         ValueTask<bool> GetSurveyStatusAsync(Guid survey);
-        ValueTask RegisterAnswerAsync(long messageId, string answerText = null, string optionText = null);
+        ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
+
         ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId);
+        ValueTask<IEnumerable<QuestionMessage>> GetSurveyOptionQuestionsAsync(Guid surveyId);
         ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message);
+
+        ValueTask<IEnumerable<Answer>> GetStudentAnswersAsync(Guid surveyId, long studentId);
+        ValueTask RegisterAnswerAsync(int messageId, string answerText = null, Image image = null);
+        ValueTask RegisterAnswerAsync(string pollId, string optionText);
     }
 }

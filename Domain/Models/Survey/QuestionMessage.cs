@@ -3,7 +3,8 @@
     public class QuestionMessage
     {
         public int Id { get; set; }
-        public long MessageId { get; set; }
+        public int MessageId { get; set; }
+        public string PollId { get; set; }
         public long StudentId { get; set; }
         public Question Question { get; set; }
     }

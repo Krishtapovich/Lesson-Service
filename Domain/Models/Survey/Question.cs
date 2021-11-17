@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.Models.Survey
 {
@@ -6,6 +7,7 @@ namespace Domain.Models.Survey
     {
         public int Id { get; set; }
         public string Text { get; set; }
+        public Guid SurveyId { get; set; }
         public ICollection<Option> Options { get; set; }
         public ICollection<QuestionMessage> Messages { get; set; }
     }

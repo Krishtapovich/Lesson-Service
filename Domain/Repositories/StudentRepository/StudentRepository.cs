@@ -1,8 +1,8 @@
-using Domain.Models.Student;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Models.Student;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Repositories.StudentRepository
 {
@@ -15,7 +15,15 @@ namespace Domain.Repositories.StudentRepository
             this.context = context;
         }
 
-        public async Task AddStudentAsync(Student student)
+        public async ValueTask<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize)
+        {
+            return await context.Groups.Include(g => g.Students)
+                                       .Skip((pageNumber - 1) * pageSize)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+        }
+
+        public async ValueTask AddStudentAsync(Student student)
         {
             var group = await GetGroupAsync(student.GroupNumber);
             group.Students.Add(student);
@@ -24,18 +32,18 @@ namespace Domain.Repositories.StudentRepository
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> CheckIfAuthorizedAsync(long studentId)
+        public async ValueTask<bool> CheckIfAuthorizedAsync(long studentId)
         {
             var student = await context.Students.FindAsync(studentId);
             return student is not null;
         }
 
-        public async Task DeleteStudentAsync(Student student)
+        public async ValueTask DeleteStudentAsync(Student student)
         {
             throw new System.NotImplementedException();
         }
 
-        public async Task UpdateStudentAsync(Student newStudent)
+        public async ValueTask UpdateStudentAsync(Student newStudent)
         {
             var student = await context.Students.FindAsync(newStudent.Id);
             var oldGroup = await GetGroupAsync(student.GroupNumber);
@@ -49,7 +57,7 @@ namespace Domain.Repositories.StudentRepository
             await context.SaveChangesAsync();
         }
 
-        private async Task<Group> GetGroupAsync(long groupNumber)
+        private async ValueTask<Group> GetGroupAsync(long groupNumber)
         {
             var group = await context.Groups.FirstOrDefaultAsync(g => g.Number == groupNumber);
             if (group is null)
@@ -57,7 +65,9 @@ namespace Domain.Repositories.StudentRepository
             return group;
         }
 
-        public async Task<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber) =>
-            (await context.Groups.Include(g => g.Students).FirstAsync(g => g.Number == groupNumber)).Students.Select(s => s.Id);
+        public async ValueTask<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber)
+        {
+            return (await context.Groups.Include(g => g.Students).FirstAsync(g => g.Number == groupNumber)).Students.Select(s => s.Id);
+        }
     }
 }

@@ -33,10 +33,11 @@ namespace Application.Bot
         {
             try
             {
-                if (poll.TotalVoterCount == 1)
+                if (!poll.IsClosed && poll.TotalVoterCount == 1)
                 {
+                    await surveyRepository.CheckIfSurveyClosedAsync(poll.Id);
                     var text = poll.Options.First(o => o.VoterCount == 1).Text;
-                    await surveyRepository.RegisterAnswerAsync(long.Parse(poll.Id), optionText: text);
+                    await surveyRepository.RegisterAnswerAsync(poll.Id, text);
                 }
             }
             catch (Exception ex)
@@ -45,11 +46,21 @@ namespace Application.Bot
             }
         }
 
+        public async ValueTask CloseSurveyPollsAsync(Guid surveyId)
+        {
+            var polls = await surveyRepository.GetSurveyOptionQuestionsAsync(surveyId);
+            foreach(var poll in polls)
+            {
+                await bot.StopPollAsync(poll.StudentId, poll.MessageId);
+            }
+        }
+
         private async ValueTask HandleReplyMessageAsync(Message message)
         {
             try
             {
                 var question = message.ReplyToMessage;
+                await surveyRepository.CheckIfSurveyClosedAsync(question.MessageId);
                 if (message.Text is not null)
                 {
                     await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: message.Text);
@@ -59,8 +70,13 @@ namespace Application.Bot
                     var file = await bot.GetFileAsync(message.Photo.Last().FileId);
                     using var stream = new MemoryStream();
                     await bot.DownloadFileAsync(file.FilePath, stream);
-                    var imageUrl = await cloud.AddImageAsync(file.FilePath, stream.ToArray());
-                    await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: imageUrl);
+                    var messageImage = await surveyRepository.GetMessageImageAsync(question.MessageId);
+                    if (messageImage is not null)
+                    {
+                        await cloud.DeleteImageAsync(messageImage.CloudId);
+                    }
+                    var image = await cloud.AddImageAsync(file.FilePath, stream.ToArray());
+                    await surveyRepository.RegisterAnswerAsync(question.MessageId, image: image);
                 }
             }
             catch (Exception ex)
@@ -94,7 +110,7 @@ namespace Application.Bot
             }
         }
 
-        public async Task SendSurveyToGroupAsync(SurveyToGroup survey)
+        public async ValueTask SendSurveyToGroupAsync(SurveyToGroup survey)
         {
             var studentIds = await studentRepository.GetGroupStudentsIdsAsync(survey.GroupNumber);
             var questions = await surveyRepository.GetSurveyQuestionsAsync(survey.Id);
@@ -103,14 +119,13 @@ namespace Application.Bot
             {
                 foreach (var question in questions)
                 {
-                    var messageId = await SendQuestionAsync(studentId, question, survey.OpenPeriod);
-                    var questionMessage = new QuestionMessage { MessageId = messageId, StudentId = studentId, Question = question };
+                    var questionMessage = await SendQuestionAsync(studentId, question, survey.OpenPeriod);
                     await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
                 }
             }
         }
 
-        private async ValueTask<long> SendQuestionAsync(long chatId, Question question, int? openPeriod = null)
+        private async ValueTask<QuestionMessage> SendQuestionAsync(long chatId, Question question, int? openPeriod = null)
         {
             Message message;
             if (question.Options.Any())
@@ -122,7 +137,7 @@ namespace Application.Bot
             {
                 message = await bot.SendTextMessageAsync(chatId, question.Text);
             }
-            return question.Options.Count == 0 ? message.MessageId : long.Parse(message.Poll.Id);
+            return new QuestionMessage { MessageId = message.MessageId, Question = question, StudentId = chatId, PollId = message.Poll?.Id };
         }
 
         private async ValueTask GetDataAsync(long chatId, bool isUpdatingData)

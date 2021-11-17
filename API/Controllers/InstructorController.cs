@@ -12,28 +12,46 @@ namespace API.Controllers
     [Route("api/instructor")]
     public class InstructorController : Controller
     {
-        private readonly IMessageService botService;
+        private readonly IMessageService messageService;
         private readonly ITimerService timerService;
         private readonly IInstructorService instructorService;
 
-        public InstructorController(IMessageService botService, ITimerService timerService, IInstructorService instructorService)
+        public InstructorController(IMessageService messageService, ITimerService timerService, IInstructorService instructorService)
         {
-            this.botService = botService;
+            this.messageService = messageService;
             this.timerService = timerService;
             this.instructorService = instructorService;
         }
 
+        [HttpGet("groups")]
+        public async ValueTask<IActionResult> GetGroupsAsync(int pageNumber, int pageSize)
+        {
+            return Ok(await instructorService.GetGroupsAsync(pageNumber, pageSize));
+        }
+
+        [HttpGet("surveys")]
+        public async ValueTask<IActionResult> GetSurveysAsync(int pageNumber, int pageSize)
+        {
+            return Ok(await instructorService.GetSurveysAsync(pageNumber, pageSize));
+        }
+
+        [HttpGet("student-answers")]
+        public async ValueTask<IActionResult> GetStudentAnswersAsync(Guid surveyId, long studentId)
+        {
+            return Ok(await instructorService.GetStudentAnswersAsync(surveyId, studentId));
+        }
+
         [HttpPost("create-survey")]
-        public async Task<IActionResult> CreateSurveyAsync([FromBody] SurveyDto survey)
+        public async ValueTask<IActionResult> CreateSurveyAsync([FromBody] SurveyDto survey)
         {
             await instructorService.CreateSurveyAsync(survey);
             return Ok();
         }
 
         [HttpPost("send-survey")]
-        public async Task<IActionResult> SendSurveyAsync([FromBody] SurveyToGroup survey)
+        public async ValueTask<IActionResult> SendSurveyAsync([FromBody] SurveyToGroup survey)
         {
-            await botService.SendSurveyAsync(survey);
+            await messageService.SendSurveyAsync(survey);
             await instructorService.ChangeSurveyStatusAsync(survey.Id, true);
             if (survey.OpenPeriod is not null)
             {
@@ -43,14 +61,15 @@ namespace API.Controllers
         }
 
         [HttpPut("close-survey")]
-        public async Task<IActionResult> CloseSurveyAsync(Guid surveyId)
+        public async ValueTask<IActionResult> CloseSurveyAsync(Guid surveyId)
         {
             await instructorService.ChangeSurveyStatusAsync(surveyId, false);
+            await messageService.CloseSurveyPollsAsync(surveyId);
             return Ok();
         }
 
         [HttpDelete("delete-survey")]
-        public async Task<IActionResult> DeleteSurveyAsync(Guid surveyId)
+        public async ValueTask<IActionResult> DeleteSurveyAsync(Guid surveyId)
         {
             await instructorService.DeleteSurveyAsync(surveyId);
             return Ok();

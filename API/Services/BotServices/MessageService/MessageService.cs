@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Application.Bot;
 using Application.Cloud;
@@ -21,15 +22,27 @@ namespace API.Services.BotServices.MessageService
 
         public async ValueTask HandleUpdateAsync(Update update)
         {
-            var handler = update.Type switch
+            try
             {
-                UpdateType.Message => botClient.HandleTextMessageAsync(update.Message),
-                UpdateType.Poll => botClient.HandlePollAnswerAsync(update.Poll),
-                _ => ValueTask.CompletedTask
-            };
-            await handler;
+                var handler = update.Type switch
+                {
+                    UpdateType.Message => botClient.HandleTextMessageAsync(update.Message),
+                    UpdateType.Poll => botClient.HandlePollAnswerAsync(update.Poll),
+                    _ => ValueTask.CompletedTask
+                };
+                await handler;
+            }
+            catch (Exception) { }
         }
 
-        public async Task SendSurveyAsync(SurveyToGroup survey) => await botClient.SendSurveyToGroupAsync(survey);
+        public async ValueTask SendSurveyAsync(SurveyToGroup survey)
+        {
+            await botClient.SendSurveyToGroupAsync(survey);
+        }
+
+        public async ValueTask CloseSurveyPollsAsync(Guid surveyId)
+        {
+            await botClient.CloseSurveyPollsAsync(surveyId);
+        }
     }
 }

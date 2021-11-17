@@ -6,10 +6,13 @@ namespace Domain.Repositories.StudentRepository
 {
     public interface IStudentRepository
     {
-        Task AddStudentAsync(Student student);
-        Task<bool> CheckIfAuthorizedAsync(long studentId);
-        Task UpdateStudentAsync(Student student);
-        Task DeleteStudentAsync(Student student);
-        Task<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber);
+        ValueTask<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize);
+        ValueTask<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber);
+
+        ValueTask<bool> CheckIfAuthorizedAsync(long studentId);
+
+        ValueTask AddStudentAsync(Student student);
+        ValueTask UpdateStudentAsync(Student student);
+        ValueTask DeleteStudentAsync(Student student);
     }
 }

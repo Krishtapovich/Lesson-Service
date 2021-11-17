@@ -16,32 +16,112 @@ namespace Domain.Repositories.SurveyRepository
             this.context = context;
         }
 
-        public async Task AddSurveyAsync(Survey survey)
+        public async ValueTask<IEnumerable<Survey>> GetSurveysAsync(int pageNumber, int pageSize)
+        {
+            return await context.Surveys.Include(s => s.Questions)
+                                        .ThenInclude(q => q.Options)
+                                        .OrderBy(s => s.CreateionTime)
+                                        .Skip((pageNumber - 1) * pageSize)
+                                        .Take(pageSize)
+                                        .ToListAsync();
+        }
+
+        public async ValueTask AddSurveyAsync(Survey survey)
         {
             await context.Surveys.AddAsync(survey);
             await context.SaveChangesAsync();
         }
 
-        public async Task ChangeSurveyStatusAsync(Guid surveyId, bool isOpened)
-        {
-            var survey = await context.Surveys.FindAsync(surveyId);
-            survey.IsClosed = !isOpened;
-            await context.SaveChangesAsync();
-        }
-
-        public async Task DeleteSurveyAsync(Guid surveyId)
+        public async ValueTask DeleteSurveyAsync(Guid surveyId)
         {
             var survey = await context.Surveys.FindAsync(surveyId);
             context.Surveys.Remove(survey);
             await context.SaveChangesAsync();
         }
 
-        public async ValueTask<bool> GetSurveyStatusAsync(Guid surveyId) => (await context.Surveys.FindAsync(surveyId)).IsClosed;
+
+
+        public async ValueTask<bool> CheckIfSurveyClosedAsync(int messageId)
+        {
+            var message = await context.QuestionMessages.Include(q => q.Question).FirstOrDefaultAsync(m => m.MessageId == messageId);
+            return await CheckIfSurveyClosedAsync(message);
+        }
+
+        private async ValueTask<bool> CheckIfSurveyClosedAsync(QuestionMessage message)
+        {
+            var survey = await context.Surveys.Include(s => s.Questions).FirstOrDefaultAsync(s => s.Id == message.Question.SurveyId);
+            if ((bool)survey?.IsClosed)
+            {
+                var exception = new Exception("Survey is closed, your answer wasn't registered");
+                exception.Data.Add("chatId", message.StudentId);
+                throw exception;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async ValueTask<bool> CheckIfSurveyClosedAsync(string pollId)
+        {
+            var message = await context.QuestionMessages.Include(m => m.Question).FirstOrDefaultAsync(m => m.PollId == pollId);
+            return await CheckIfSurveyClosedAsync(message);
+        }
+
+
+
+        public async ValueTask<IEnumerable<Image>> GetSurveyImagesAsync(Guid surveyId)
+        {
+            var messages = (await context.Questions.Include(q => q.Messages).FirstAsync(q => q.SurveyId == surveyId)).Messages;
+            return await context.Answers.Include(a => a.Image)
+                                        .Include(a => a.QuestionMessage)
+                                        .Where(a => a.Image != null && messages.Contains(a.QuestionMessage))
+                                        .Select(a => a.Image)
+                                        .ToListAsync();
+        }
+
+
+        public async ValueTask<IEnumerable<QuestionMessage>> GetSurveyMessagesAsync(Guid surveyId)
+        {
+            return await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).ToListAsync();
+        }
+
+
+
+        public async ValueTask<Image> GetMessageImageAsync(int messageId)
+        {
+            var message = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
+            return message?.Image;
+        }
+
+
+
+        public async ValueTask<bool> GetSurveyStatusAsync(Guid surveyId)
+        {
+            return (await context.Surveys.FindAsync(surveyId)).IsClosed;
+        }
+
+        public async ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened)
+        {
+            var survey = await context.Surveys.FindAsync(surveyId);
+            survey.IsClosed = !isOpened;
+            await context.SaveChangesAsync();
+        }
+
+
 
         public async ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId)
         {
-            var survey = await context.Surveys.Include(s => s.Questions).ThenInclude(q => q.Options).FirstAsync(s => s.Id == surveyId);
-            return survey.Questions;
+            return (await context.Surveys.Include(s => s.Questions).ThenInclude(q => q.Options).FirstAsync(s => s.Id == surveyId)).Questions;
+        }
+
+        public async ValueTask<IEnumerable<QuestionMessage>> GetSurveyOptionQuestionsAsync(Guid surveyId)
+        {
+            var r = await context.QuestionMessages.Include(qm => qm.Question)
+                                                 .ThenInclude(q => q.Options)
+                                                 .Where(qm => qm.Question.SurveyId == surveyId && qm.PollId != null)
+                                                 .ToListAsync();
+            return r;
         }
 
         public async ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message)
@@ -53,38 +133,81 @@ namespace Domain.Repositories.SurveyRepository
             }
             else
             {
-                question.Messages.Add(message);
+                var questionMessage = await context.QuestionMessages
+                    .FirstOrDefaultAsync(q => q.Question.Id == message.Question.Id && q.StudentId == message.StudentId);
+                if (questionMessage is null)
+                {
+                    question.Messages.Add(message);
+                }
+                else
+                {
+                    questionMessage.MessageId = message.MessageId;
+                    questionMessage.PollId = message.PollId;
+                }
             }
             await context.SaveChangesAsync();
         }
 
-        public async ValueTask RegisterAnswerAsync(long messageId, string answerText = null, string optionText = null)
+
+        public async ValueTask<IEnumerable<Answer>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
-            var questionMessage = await context.QuestionMessages.FirstAsync(qm => qm.MessageId == messageId);
-            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Messages.Contains(questionMessage));
-            var survey = await context.Surveys.FirstAsync(s => s.Questions.Contains(question));
-            if(survey.IsClosed)
-            {
-                var exception = new Exception("Survey is closed, your answer wasn't registered");
-                exception.Data.Add("chatId", questionMessage.StudentId);
-                throw exception;
-            }
-            var answer = await context.Answers.FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
-            var option = question.Options.FirstOrDefault(o => o.Text == optionText);
+            return await context.Answers.Where(a => a.SurveyId == surveyId && a.QuestionMessage.StudentId == studentId)
+                                        .Include(a => a.Option)
+                                        .Include(a => a.Image)
+                                        .OrderBy(a => a.QuestionMessageId)
+                                        .ToListAsync();
+        }
+
+        public async ValueTask RegisterAnswerAsync(int messageId, string answerText = null, Image image = null)
+        {
+            var message = await context.QuestionMessages.FirstAsync(qm => qm.MessageId == messageId);
+            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.Question.Id);
+            var answer = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
 
             if (answer is null)
             {
                 answer = new Answer
                 {
-                    QuestionMessage = questionMessage,
+                    SurveyId = question.SurveyId,
+                    QuestionMessage = message,
                     Text = answerText,
+                    Image = image
+                };
+                if (image is not null)
+                    image.Answer = answer;
+                await context.Answers.AddAsync(answer);
+            }
+            else
+            {
+                answer.Text = answerText;
+                if (answer.Image is not null)
+                {
+                    context.Images.Remove(answer.Image);
+                }
+                answer.Image = image;
+            }
+            await context.SaveChangesAsync();
+        }
+
+        public async ValueTask RegisterAnswerAsync(string pollId, string optionText)
+        {
+            var message = await context.QuestionMessages.FirstAsync(qm => qm.PollId == pollId);
+            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.Question.Id);
+            var answer = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.PollId == pollId);
+            var option = question.Options.First(o => o.Text == optionText);
+
+            if (answer is null)
+            {
+                answer = new Answer
+                {
+                    SurveyId = question.SurveyId,
+                    QuestionMessage = message,
                     Option = option
                 };
                 await context.Answers.AddAsync(answer);
             }
             else
             {
-                answer.Text = answerText;
                 answer.Option = option;
             }
             await context.SaveChangesAsync();

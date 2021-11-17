@@ -16,6 +16,7 @@ namespace Domain
         public DbSet<QuestionMessage> QuestionMessages { get; set; }
         public DbSet<Option> Options { get; set; }
         public DbSet<Answer> Answers { get; set; }
+        public DbSet<Image> Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -24,9 +25,12 @@ namespace Domain
             builder.Entity<Group>().HasMany(g => g.Students).WithOne();
 
             builder.Entity<Survey>().HasMany(s => s.Questions).WithOne().OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Question>().HasMany(q => q.Options).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Question>().HasMany(q => q.Messages).WithOne(qm => qm.Question).OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Answer>().HasOne(a => a.QuestionMessage).WithOne().HasForeignKey<Answer>(a => a.QuestionMessageId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Answer>().HasOne(a => a.Image).WithOne(i => i.Answer).HasForeignKey<Image>(i => i.AnswerId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
