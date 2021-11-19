@@ -14,10 +14,9 @@ namespace Domain.Repositories.SurveyRepository
         ValueTask<bool> CheckIfSurveyClosedAsync(int messageId);
         ValueTask<bool> CheckIfSurveyClosedAsync(string pollId);
 
-        ValueTask<IEnumerable<Image>> GetSurveyImagesAsync(Guid surveyId);
+        ValueTask<Image> GetAnswerImageAsync(int messageId);
+        ValueTask<IEnumerable<Image>> GetAnswersImagesAsync(Guid surveyId);
         ValueTask<IEnumerable<QuestionMessage>> GetSurveyMessagesAsync(Guid surveyId);
-
-        ValueTask<Image> GetMessageImageAsync(int messageId);
 
         ValueTask<bool> GetSurveyStatusAsync(Guid survey);
         ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);

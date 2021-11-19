@@ -2,7 +2,7 @@ using API.Services.BotServices;
 using API.Services.BotServices.MessageService;
 using API.Services.InstructorService;
 using API.Services.TimerService;
-using Application.Cloud;
+using Application.CloudStorage;
 using Application.MappingProfiles;
 using Domain.Repositories.StudentRepository;
 using Domain.Repositories.SurveyRepository;
@@ -33,8 +33,7 @@ namespace API.Extensions
             services.AddSingleton<ITimerService, TimerService>();
             services.AddHostedService(provider => provider.GetService<ITimerService>());
 
-            services.AddScoped<IImageCloud, ImageCloud>();
-            services.Configure<CloudinarySettings>(configuration.GetSection("CloudConfiguration"));
+            services.AddScoped<ICloudStorage, CloudStorage>();
 
             services.AddControllers().AddNewtonsoftJson();
 

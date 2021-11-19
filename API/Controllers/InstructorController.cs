@@ -63,14 +63,15 @@ namespace API.Controllers
         [HttpPut("close-survey")]
         public async ValueTask<IActionResult> CloseSurveyAsync(Guid surveyId)
         {
-            await instructorService.ChangeSurveyStatusAsync(surveyId, false);
             await messageService.CloseSurveyPollsAsync(surveyId);
+            await instructorService.ChangeSurveyStatusAsync(surveyId, false);
             return Ok();
         }
 
         [HttpDelete("delete-survey")]
         public async ValueTask<IActionResult> DeleteSurveyAsync(Guid surveyId)
         {
+            await messageService.CloseSurveyPollsAsync(surveyId);
             await instructorService.DeleteSurveyAsync(surveyId);
             return Ok();
         }

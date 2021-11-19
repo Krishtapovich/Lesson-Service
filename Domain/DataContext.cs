@@ -30,7 +30,7 @@ namespace Domain
             builder.Entity<Question>().HasMany(q => q.Messages).WithOne(qm => qm.Question).OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Answer>().HasOne(a => a.QuestionMessage).WithOne().HasForeignKey<Answer>(a => a.QuestionMessageId).OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<Answer>().HasOne(a => a.Image).WithOne(i => i.Answer).HasForeignKey<Image>(i => i.AnswerId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Answer>().HasOne(a => a.Image).WithOne().HasForeignKey<Answer>(a => a.ImageId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

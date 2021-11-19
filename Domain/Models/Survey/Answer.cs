@@ -10,6 +10,7 @@ namespace Domain.Models.Survey
         public QuestionMessage QuestionMessage { get; set; }
         public Option Option { get; set; }
         public string Text { get; set; }
+        public int? ImageId { get; set; }
         public Image Image { get; set; }
     }
 

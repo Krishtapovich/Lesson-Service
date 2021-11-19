@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Application.Cloud;
+using Application.CloudStorage;
 using AutoMapper;
 using Domain.Models.Student;
 using Domain.Models.Survey;
@@ -14,10 +14,10 @@ namespace API.Services.InstructorService
     {
         private readonly ISurveyRepository surveyRepository;
         private readonly IStudentRepository studentRepository;
-        private readonly IImageCloud cloud;
+        private readonly ICloudStorage cloud;
         private readonly IMapper mapper;
 
-        public InstructorService(ISurveyRepository surveyRepository, IStudentRepository studentRepository, IImageCloud cloud, IMapper mapper)
+        public InstructorService(ISurveyRepository surveyRepository, IStudentRepository studentRepository, ICloudStorage cloud, IMapper mapper)
         {
             this.surveyRepository = surveyRepository;
             this.studentRepository = studentRepository;
@@ -54,10 +54,10 @@ namespace API.Services.InstructorService
 
         public async Task DeleteSurveyAsync(Guid surveyId)
         {
-            var images = await surveyRepository.GetSurveyImagesAsync(surveyId);
+            var images = await surveyRepository.GetAnswersImagesAsync(surveyId);
             foreach (var image in images)
             {
-                await cloud.DeleteImageAsync(image?.CloudId);
+                await cloud.DeleteImageAsync(image.FileName);
             }
             await surveyRepository.DeleteSurveyAsync(surveyId);
         }

@@ -49,6 +49,10 @@ namespace Domain.Repositories.SurveyRepository
 
         private async ValueTask<bool> CheckIfSurveyClosedAsync(QuestionMessage message)
         {
+            if (message is null)
+            {
+                throw new NullReferenceException("Survey doesn't exist or wrong message replying");
+            }
             var survey = await context.Surveys.Include(s => s.Questions).FirstOrDefaultAsync(s => s.Id == message.Question.SurveyId);
             if ((bool)survey?.IsClosed)
             {
@@ -70,28 +74,28 @@ namespace Domain.Repositories.SurveyRepository
 
 
 
-        public async ValueTask<IEnumerable<Image>> GetSurveyImagesAsync(Guid surveyId)
+        public async ValueTask<Image> GetAnswerImageAsync(int messageId)
         {
-            var messages = (await context.Questions.Include(q => q.Messages).FirstAsync(q => q.SurveyId == surveyId)).Messages;
-            return await context.Answers.Include(a => a.Image)
+            var message = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
+            return message?.Image;
+        }
+
+        public async ValueTask<IEnumerable<Image>> GetAnswersImagesAsync(Guid surveyId)
+        {
+            var messages = await context.QuestionMessages.Include(qm => qm.Question).Where(qm => qm.Question.SurveyId == surveyId).ToListAsync();
+            var images = await context.Answers.Include(a => a.Image)
                                         .Include(a => a.QuestionMessage)
                                         .Where(a => a.Image != null && messages.Contains(a.QuestionMessage))
                                         .Select(a => a.Image)
                                         .ToListAsync();
+            return images;
         }
+
 
 
         public async ValueTask<IEnumerable<QuestionMessage>> GetSurveyMessagesAsync(Guid surveyId)
         {
             return await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).ToListAsync();
-        }
-
-
-
-        public async ValueTask<Image> GetMessageImageAsync(int messageId)
-        {
-            var message = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
-            return message?.Image;
         }
 
 
@@ -117,11 +121,10 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask<IEnumerable<QuestionMessage>> GetSurveyOptionQuestionsAsync(Guid surveyId)
         {
-            var r = await context.QuestionMessages.Include(qm => qm.Question)
+            return await context.QuestionMessages.Include(qm => qm.Question)
                                                  .ThenInclude(q => q.Options)
                                                  .Where(qm => qm.Question.SurveyId == surveyId && qm.PollId != null)
                                                  .ToListAsync();
-            return r;
         }
 
         public async ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message)
@@ -149,6 +152,7 @@ namespace Domain.Repositories.SurveyRepository
         }
 
 
+
         public async ValueTask<IEnumerable<Answer>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
             return await context.Answers.Where(a => a.SurveyId == surveyId && a.QuestionMessage.StudentId == studentId)
@@ -173,8 +177,8 @@ namespace Domain.Repositories.SurveyRepository
                     Text = answerText,
                     Image = image
                 };
-                if (image is not null)
-                    image.Answer = answer;
+                //if (image is not null)
+                //    image.Answer = answer;
                 await context.Answers.AddAsync(answer);
             }
             else

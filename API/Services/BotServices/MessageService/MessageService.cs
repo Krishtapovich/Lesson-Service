@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Application.Bot;
-using Application.Cloud;
+using Application.CloudStorage;
 using Domain.Models.Survey;
 using Domain.Repositories.StudentRepository;
 using Domain.Repositories.SurveyRepository;
@@ -15,7 +15,7 @@ namespace API.Services.BotServices.MessageService
     {
         private readonly BotClient botClient;
 
-        public MessageService(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository, IImageCloud cloud)
+        public MessageService(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository, ICloudStorage cloud)
         {
             botClient = new BotClient(bot, studentRepository, surveyRepository, cloud);
         }

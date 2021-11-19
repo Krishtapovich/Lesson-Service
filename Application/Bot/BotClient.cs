@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Cloud;
+using Application.CloudStorage;
 using Application.Constants;
 using Domain.Models.Student;
 using Domain.Models.Survey;
@@ -19,9 +19,9 @@ namespace Application.Bot
         private readonly ITelegramBotClient bot;
         private readonly IStudentRepository studentRepository;
         private readonly ISurveyRepository surveyRepository;
-        private readonly IImageCloud cloud;
+        private readonly ICloudStorage cloud;
 
-        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository, IImageCloud cloud)
+        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository, ICloudStorage cloud)
         {
             this.bot = bot;
             this.studentRepository = studentRepository;
@@ -48,10 +48,13 @@ namespace Application.Bot
 
         public async ValueTask CloseSurveyPollsAsync(Guid surveyId)
         {
-            var polls = await surveyRepository.GetSurveyOptionQuestionsAsync(surveyId);
-            foreach(var poll in polls)
+            if (!await surveyRepository.GetSurveyStatusAsync(surveyId))
             {
-                await bot.StopPollAsync(poll.StudentId, poll.MessageId);
+                var polls = await surveyRepository.GetSurveyOptionQuestionsAsync(surveyId);
+                foreach (var poll in polls)
+                {
+                    await bot.StopPollAsync(poll.StudentId, poll.MessageId);
+                }
             }
         }
 
@@ -67,17 +70,22 @@ namespace Application.Bot
                 }
                 else
                 {
-                    var file = await bot.GetFileAsync(message.Photo.Last().FileId);
-                    using var stream = new MemoryStream();
-                    await bot.DownloadFileAsync(file.FilePath, stream);
-                    var messageImage = await surveyRepository.GetMessageImageAsync(question.MessageId);
+                    var messageImage = await surveyRepository.GetAnswerImageAsync(question.MessageId);
                     if (messageImage is not null)
                     {
-                        await cloud.DeleteImageAsync(messageImage.CloudId);
+                        await cloud.DeleteImageAsync(messageImage.FileName);
                     }
-                    var image = await cloud.AddImageAsync(file.FilePath, stream.ToArray());
-                    await surveyRepository.RegisterAnswerAsync(question.MessageId, image: image);
+                    using (var stream = new MemoryStream())
+                    {
+                        await bot.GetInfoAndDownloadFileAsync(message.Photo[2].FileId, stream);
+                        var image = await cloud.UploadImageAsync($"{message.MessageId}.jpg", stream);
+                        await surveyRepository.RegisterAnswerAsync(question.MessageId, image: image);
+                    }
                 }
+            }
+            catch (NullReferenceException ex)
+            {
+                await bot.SendTextMessageAsync(message.Chat.Id, ex.Message);
             }
             catch (Exception ex)
             {
@@ -161,7 +169,7 @@ namespace Application.Bot
             var isAuthorized = await studentRepository.CheckIfAuthorizedAsync(message.Chat.Id);
             await (isAuthorized ? studentRepository.UpdateStudentAsync(student) : studentRepository.AddStudentAsync(student));
 
-            var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { BotConstants.Update }, resizeKeyboard: true);
+            var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { BotConstants.Update });
             await bot.SendTextMessageAsync(message.Chat.Id, BotConstants.DataSaved, replyMarkup: replyButton);
         }
     }
