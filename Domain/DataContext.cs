@@ -22,15 +22,17 @@ namespace Domain
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Group>().HasMany(g => g.Students).WithOne();
+            builder.Entity<Group>().HasMany(g => g.Students).WithOne().OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Survey>().HasMany(s => s.Questions).WithOne().OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Question>().HasMany(q => q.Options).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Question>().HasMany(q => q.Messages).WithOne(qm => qm.Question).OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Answer>().HasOne(a => a.QuestionMessage).WithOne().HasForeignKey<Answer>(a => a.QuestionMessageId).OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<Answer>().HasOne(a => a.Image).WithOne().HasForeignKey<Answer>(a => a.ImageId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<QuestionMessage>().HasOne(qm => qm.Student).WithMany().HasForeignKey(qm => qm.StudentId).OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Option>().HasOne(o => o.Question).WithMany(q => q.Options).HasForeignKey(o => o.QuestionId).OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Answer>().HasOne(a => a.Option).WithMany().HasForeignKey(a => a.OptionId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

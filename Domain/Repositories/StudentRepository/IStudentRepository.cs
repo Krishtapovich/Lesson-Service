@@ -7,7 +7,7 @@ namespace Domain.Repositories.StudentRepository
     public interface IStudentRepository
     {
         ValueTask<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize);
-        ValueTask<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber);
+        ValueTask<IEnumerable<Student>> GetGroupStudentsAsync(long groupNumber);
 
         ValueTask<bool> CheckIfAuthorizedAsync(long studentId);
 

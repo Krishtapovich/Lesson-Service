@@ -65,9 +65,9 @@ namespace Domain.Repositories.StudentRepository
             return group;
         }
 
-        public async ValueTask<IEnumerable<long>> GetGroupStudentsIdsAsync(long groupNumber)
+        public async ValueTask<IEnumerable<Student>> GetGroupStudentsAsync(long groupNumber)
         {
-            return (await context.Groups.Include(g => g.Students).FirstAsync(g => g.Number == groupNumber)).Students.Select(s => s.Id);
+            return (await context.Groups.Include(g => g.Students).FirstAsync(g => g.Number == groupNumber)).Students;
         }
     }
 }

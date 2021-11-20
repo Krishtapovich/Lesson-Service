@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211110192500_SurveyFixed")]
-    partial class SurveyFixed
+    [Migration("20211120202240_DatabaseStructure")]
+    partial class DatabaseStructure
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,9 +20,9 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Student.Group", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("Number")
                         .HasColumnType("INTEGER");
@@ -41,8 +41,8 @@ namespace Domain.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("GroupId")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("GroupNumber")
                         .HasColumnType("INTEGER");
@@ -59,17 +59,14 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Answer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("OptionId")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("OptionId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("QuestionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("StudentId")
+                    b.Property<int>("QuestionMessageId")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("SurveyId")
@@ -82,20 +79,45 @@ namespace Domain.Migrations
 
                     b.HasIndex("OptionId");
 
+                    b.HasIndex("QuestionMessageId");
+
                     b.ToTable("Answers");
+                });
+
+            modelBuilder.Entity("Domain.Models.Survey.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AnswerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnswerId")
+                        .IsUnique();
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Option", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("QuestionId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")
                         .HasColumnType("TEXT");
@@ -109,11 +131,11 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("SurveyId")
+                    b.Property<Guid>("SurveyId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
@@ -128,15 +150,18 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.Survey.QuestionMessage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PollId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("MessageId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("QuestionId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("StudentId")
                         .HasColumnType("INTEGER");
@@ -145,7 +170,9 @@ namespace Domain.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("QuestionMessage");
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("QuestionMessages");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Survey", b =>
@@ -153,6 +180,12 @@ namespace Domain.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateionTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -163,42 +196,86 @@ namespace Domain.Migrations
                 {
                     b.HasOne("Domain.Models.Student.Group", null)
                         .WithMany("Students")
-                        .HasForeignKey("GroupId");
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Answer", b =>
                 {
                     b.HasOne("Domain.Models.Survey.Option", "Option")
                         .WithMany()
-                        .HasForeignKey("OptionId");
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.Models.Survey.QuestionMessage", "QuestionMessage")
+                        .WithMany()
+                        .HasForeignKey("QuestionMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Option");
+
+                    b.Navigation("QuestionMessage");
+                });
+
+            modelBuilder.Entity("Domain.Models.Survey.Image", b =>
+                {
+                    b.HasOne("Domain.Models.Survey.Answer", "Answer")
+                        .WithOne("Image")
+                        .HasForeignKey("Domain.Models.Survey.Image", "AnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Option", b =>
                 {
-                    b.HasOne("Domain.Models.Survey.Question", null)
+                    b.HasOne("Domain.Models.Survey.Question", "Question")
                         .WithMany("Options")
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>
                 {
                     b.HasOne("Domain.Models.Survey.Survey", null)
                         .WithMany("Questions")
-                        .HasForeignKey("SurveyId");
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.QuestionMessage", b =>
                 {
-                    b.HasOne("Domain.Models.Survey.Question", null)
+                    b.HasOne("Domain.Models.Survey.Question", "Question")
                         .WithMany("Messages")
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.Student.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Domain.Models.Student.Group", b =>
                 {
                     b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("Domain.Models.Survey.Answer", b =>
+                {
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("Domain.Models.Survey.Question", b =>

@@ -16,7 +16,6 @@ namespace Domain.Repositories.SurveyRepository
 
         ValueTask<Image> GetAnswerImageAsync(int messageId);
         ValueTask<IEnumerable<Image>> GetAnswersImagesAsync(Guid surveyId);
-        ValueTask<IEnumerable<QuestionMessage>> GetSurveyMessagesAsync(Guid surveyId);
 
         ValueTask<bool> GetSurveyStatusAsync(Guid survey);
         ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);

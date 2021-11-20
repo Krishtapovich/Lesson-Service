@@ -21,7 +21,8 @@ namespace Application.Bot
         private readonly ISurveyRepository surveyRepository;
         private readonly ICloudStorage cloud;
 
-        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, ISurveyRepository surveyRepository, ICloudStorage cloud)
+        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, 
+            ISurveyRepository surveyRepository, ICloudStorage cloud)
         {
             this.bot = bot;
             this.studentRepository = studentRepository;
@@ -64,11 +65,11 @@ namespace Application.Bot
             {
                 var question = message.ReplyToMessage;
                 await surveyRepository.CheckIfSurveyClosedAsync(question.MessageId);
-                if (message.Text is not null)
+                if (message.Text is not null && question.Poll is null)
                 {
                     await surveyRepository.RegisterAnswerAsync(question.MessageId, answerText: message.Text);
                 }
-                else
+                else if (message.Photo is not null && question.Poll is null)
                 {
                     var messageImage = await surveyRepository.GetAnswerImageAsync(question.MessageId);
                     if (messageImage is not null)
@@ -82,8 +83,12 @@ namespace Application.Bot
                         await surveyRepository.RegisterAnswerAsync(question.MessageId, image: image);
                     }
                 }
+                else
+                {
+                    throw new ArgumentException(BotConstants.Unknown);
+                }
             }
-            catch (NullReferenceException ex)
+            catch (ArgumentException ex)
             {
                 await bot.SendTextMessageAsync(message.Chat.Id, ex.Message);
             }
@@ -101,8 +106,8 @@ namespace Application.Bot
                 {
                     var action = message.Text switch
                     {
-                        "/start" => GetDataAsync(message.Chat.Id, false),
-                        "Update data" => GetDataAsync(message.Chat.Id, true),
+                        BotConstants.Start => GetDataAsync(message.Chat.Id, false),
+                        BotConstants.Update => GetDataAsync(message.Chat.Id, true),
                         _ => ParseDataAsync(message)
                     };
                     await action;
@@ -120,32 +125,40 @@ namespace Application.Bot
 
         public async ValueTask SendSurveyToGroupAsync(SurveyToGroup survey)
         {
-            var studentIds = await studentRepository.GetGroupStudentsIdsAsync(survey.GroupNumber);
+            var students = await studentRepository.GetGroupStudentsAsync(survey.GroupNumber);
             var questions = await surveyRepository.GetSurveyQuestionsAsync(survey.Id);
 
-            foreach (var studentId in studentIds)
+            foreach (var student in students)
             {
                 foreach (var question in questions)
                 {
-                    var questionMessage = await SendQuestionAsync(studentId, question, survey.OpenPeriod);
+                    var questionMessage = await SendQuestionAsync(student, question, survey.OpenPeriod);
                     await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
                 }
             }
         }
 
-        private async ValueTask<QuestionMessage> SendQuestionAsync(long chatId, Question question, int? openPeriod = null)
+        private async ValueTask<QuestionMessage> SendQuestionAsync(Student student, Question question, int? openPeriod = null)
         {
             Message message;
             if (question.Options.Any())
             {
                 var pollOptions = question.Options.Select(o => o.Text);
-                message = await bot.SendPollAsync(chatId, question.Text, pollOptions, openPeriod: openPeriod);
+                message = await bot.SendPollAsync(student.Id, question.Text, pollOptions, openPeriod: openPeriod);
             }
             else
             {
-                message = await bot.SendTextMessageAsync(chatId, question.Text);
+                message = await bot.SendTextMessageAsync(student.Id, question.Text);
             }
-            return new QuestionMessage { MessageId = message.MessageId, Question = question, StudentId = chatId, PollId = message.Poll?.Id };
+            return new QuestionMessage
+            {
+                MessageId = message.MessageId,
+                QuestionId = question.Id,
+                Question = question,
+                StudentId = student.Id,
+                Student = student,
+                PollId = message.Poll?.Id
+            };
         }
 
         private async ValueTask GetDataAsync(long chatId, bool isUpdatingData)
@@ -169,7 +182,7 @@ namespace Application.Bot
             var isAuthorized = await studentRepository.CheckIfAuthorizedAsync(message.Chat.Id);
             await (isAuthorized ? studentRepository.UpdateStudentAsync(student) : studentRepository.AddStudentAsync(student));
 
-            var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { BotConstants.Update });
+            var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { BotConstants.Update }) { ResizeKeyboard = true };
             await bot.SendTextMessageAsync(message.Chat.Id, BotConstants.DataSaved, replyMarkup: replyButton);
         }
     }

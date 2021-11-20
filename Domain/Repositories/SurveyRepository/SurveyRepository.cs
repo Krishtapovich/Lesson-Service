@@ -51,7 +51,7 @@ namespace Domain.Repositories.SurveyRepository
         {
             if (message is null)
             {
-                throw new NullReferenceException("Survey doesn't exist or wrong message replying");
+                throw new ArgumentException("Survey doesn't exist or wrong message is replied");
             }
             var survey = await context.Surveys.Include(s => s.Questions).FirstOrDefaultAsync(s => s.Id == message.Question.SurveyId);
             if ((bool)survey?.IsClosed)
@@ -76,26 +76,18 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask<Image> GetAnswerImageAsync(int messageId)
         {
-            var message = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
+            var message = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessageId == messageId);
             return message?.Image;
         }
 
         public async ValueTask<IEnumerable<Image>> GetAnswersImagesAsync(Guid surveyId)
         {
             var messages = await context.QuestionMessages.Include(qm => qm.Question).Where(qm => qm.Question.SurveyId == surveyId).ToListAsync();
-            var images = await context.Answers.Include(a => a.Image)
-                                        .Include(a => a.QuestionMessage)
-                                        .Where(a => a.Image != null && messages.Contains(a.QuestionMessage))
-                                        .Select(a => a.Image)
-                                        .ToListAsync();
-            return images;
-        }
-
-
-
-        public async ValueTask<IEnumerable<QuestionMessage>> GetSurveyMessagesAsync(Guid surveyId)
-        {
-            return await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).ToListAsync();
+            return await context.Answers.Include(a => a.Image)
+                                              .Include(a => a.QuestionMessage)
+                                              .Where(a => a.Image != null && messages.Contains(a.QuestionMessage))
+                                              .Select(a => a.Image)
+                                              .ToListAsync();
         }
 
 
@@ -130,24 +122,18 @@ namespace Domain.Repositories.SurveyRepository
         public async ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message)
         {
             var question = await context.Questions.Include(q => q.Messages).FirstAsync(q => q.Id == questionId);
-            if (question.Messages is null)
+            var questionMessage = await context.QuestionMessages.FirstOrDefaultAsync(qm => qm.QuestionId == message.QuestionId &&
+                                                                                           qm.StudentId == message.StudentId);
+            if (questionMessage is null)
             {
-                question.Messages = new List<QuestionMessage> { message };
+                question.Messages.Add(message);
             }
             else
             {
-                var questionMessage = await context.QuestionMessages
-                    .FirstOrDefaultAsync(q => q.Question.Id == message.Question.Id && q.StudentId == message.StudentId);
-                if (questionMessage is null)
-                {
-                    question.Messages.Add(message);
-                }
-                else
-                {
-                    questionMessage.MessageId = message.MessageId;
-                    questionMessage.PollId = message.PollId;
-                }
+                questionMessage.MessageId = message.MessageId;
+                questionMessage.PollId = message.PollId;
             }
+
             await context.SaveChangesAsync();
         }
 
@@ -158,14 +144,14 @@ namespace Domain.Repositories.SurveyRepository
             return await context.Answers.Where(a => a.SurveyId == surveyId && a.QuestionMessage.StudentId == studentId)
                                         .Include(a => a.Option)
                                         .Include(a => a.Image)
-                                        .OrderBy(a => a.QuestionMessageId)
+                                        .OrderBy(a => a.QuestionMessage.Id)
                                         .ToListAsync();
         }
 
         public async ValueTask RegisterAnswerAsync(int messageId, string answerText = null, Image image = null)
         {
             var message = await context.QuestionMessages.FirstAsync(qm => qm.MessageId == messageId);
-            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.Question.Id);
+            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.QuestionId);
             var answer = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.MessageId == messageId);
 
             if (answer is null)
@@ -177,8 +163,6 @@ namespace Domain.Repositories.SurveyRepository
                     Text = answerText,
                     Image = image
                 };
-                //if (image is not null)
-                //    image.Answer = answer;
                 await context.Answers.AddAsync(answer);
             }
             else
@@ -196,7 +180,7 @@ namespace Domain.Repositories.SurveyRepository
         public async ValueTask RegisterAnswerAsync(string pollId, string optionText)
         {
             var message = await context.QuestionMessages.FirstAsync(qm => qm.PollId == pollId);
-            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.Question.Id);
+            var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.QuestionId);
             var answer = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessage.PollId == pollId);
             var option = question.Options.First(o => o.Text == optionText);
 

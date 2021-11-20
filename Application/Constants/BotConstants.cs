@@ -3,6 +3,7 @@ namespace Application.Constants
     public static class BotConstants
     {
         public const string ReceiveData = "Enter your data in next format:\nFirst name\nLast name\nGroup number";
+        public const string Start = "/start";
         public const string Update = "Update data";
         public const string Authorized = "You've already authorized";
         public const string DataSaved = "Your data successfully saved";
