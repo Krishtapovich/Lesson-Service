@@ -26,10 +26,11 @@ namespace Domain.Repositories.SurveyRepository
                                         .ToListAsync();
         }
 
-        public async ValueTask AddSurveyAsync(Survey survey)
+        public async ValueTask<Survey> AddSurveyAsync(Survey survey)
         {
-            await context.Surveys.AddAsync(survey);
+            var newSurvey = await context.Surveys.AddAsync(survey);
             await context.SaveChangesAsync();
+            return newSurvey.Entity;
         }
 
         public async ValueTask DeleteSurveyAsync(Guid surveyId)

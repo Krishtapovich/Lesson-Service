@@ -8,6 +8,11 @@ API/appsettings.json
 API/lesson-service.db
 API/lesson-service-cloud.json
 
+client-app/node_modules/
+client-app/npm-debug.log
+client-app/yarn-debug.log
+client-app/yarn-error.log
+
 # User-specific files
 *.rsuser
 *.suo

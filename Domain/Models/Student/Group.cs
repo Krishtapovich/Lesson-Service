@@ -6,6 +6,6 @@ namespace Domain.Models.Student
     {
         public int Id { get; set; }
         public long Number { get; set; }
-        public ICollection<Student> Students { get; set; } = new List<Student>();
+        public ICollection<Student> Students { get; set; }
     }
 }

@@ -27,7 +27,6 @@ namespace Domain.Repositories.StudentRepository
         {
             var group = await GetGroupAsync(student.GroupNumber);
             group.Students.Add(student);
-
             await context.Students.AddAsync(student);
             await context.SaveChangesAsync();
         }
@@ -53,13 +52,12 @@ namespace Domain.Repositories.StudentRepository
             student.LastName = newStudent.LastName;
             student.GroupNumber = newGroup.Number;
             newGroup.Students.Add(student);
-
             await context.SaveChangesAsync();
         }
 
         private async ValueTask<Group> GetGroupAsync(long groupNumber)
         {
-            var group = await context.Groups.FirstOrDefaultAsync(g => g.Number == groupNumber);
+            var group = await context.Groups.Include(g => g.Students).FirstOrDefaultAsync(g => g.Number == groupNumber);
             if (group is null)
                 group = (await context.Groups.AddAsync(new Group { Number = groupNumber })).Entity;
             return group;

@@ -18,10 +18,20 @@ namespace API.Extensions
         {
             var botConfiguration = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
 
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials()
+                          .WithOrigins("http://localhost:3000");
+                });
+            });
+
             services.AddHostedService<ConfigurationService>();
 
-            services.AddHttpClient("tgwebhook")
-                .AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botConfiguration.Token, client));
+            services.AddHttpClient("tgwebhook").AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botConfiguration.Token, client));
 
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<IStudentRepository, StudentRepository>();

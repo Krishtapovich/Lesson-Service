@@ -44,8 +44,7 @@ namespace API.Controllers
         [HttpPost("create-survey")]
         public async ValueTask<IActionResult> CreateSurveyAsync([FromBody] SurveyDto survey)
         {
-            await instructorService.CreateSurveyAsync(survey);
-            return Ok();
+            return Ok(await instructorService.CreateSurveyAsync(survey));
         }
 
         [HttpPost("send-survey")]

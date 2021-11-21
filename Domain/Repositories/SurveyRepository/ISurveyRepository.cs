@@ -8,7 +8,7 @@ namespace Domain.Repositories.SurveyRepository
     public interface ISurveyRepository
     {
         ValueTask<IEnumerable<Survey>> GetSurveysAsync(int pageNumber, int pageSize);
-        ValueTask AddSurveyAsync(Survey survey);
+        ValueTask<Survey> AddSurveyAsync(Survey survey);
         ValueTask DeleteSurveyAsync(Guid surveyId);
 
         ValueTask<bool> CheckIfSurveyClosedAsync(int messageId);

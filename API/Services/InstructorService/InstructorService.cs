@@ -47,9 +47,10 @@ namespace API.Services.InstructorService
             await surveyRepository.ChangeSurveyStatusAsync(surveyId, isOpened);
         }
 
-        public async Task CreateSurveyAsync(SurveyDto surveyDto)
+        public async Task<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto)
         {
-            await surveyRepository.AddSurveyAsync(mapper.Map<Survey>(surveyDto));
+            var newSurvey = await surveyRepository.AddSurveyAsync(mapper.Map<Survey>(surveyDto));
+            return mapper.Map<SurveyDto>(newSurvey);
         }
 
         public async Task DeleteSurveyAsync(Guid surveyId)

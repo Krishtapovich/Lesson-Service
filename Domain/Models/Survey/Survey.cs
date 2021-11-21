@@ -14,6 +14,7 @@ namespace Domain.Models.Survey
     public class SurveyDto
     {
         public Guid Id { get; set; }
+        public bool isClosed { get; set; }
         public ICollection<QuestionDto> Questions { get; set; }
     }
 
