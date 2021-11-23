@@ -6,8 +6,10 @@
       "@Components/*": ["./Components/*"],
       "@Models/*": ["./Models/*"],
       "@Services/*": ["./Services/*"],
+      "@Pages/*": ["./Pages/*"],
       "@Stores": ["./Stores"],
-      "@Stores/*": ["./Stores/*"]
+      "@Stores/*": ["./Stores/*"],
+      "@Utils/*": ["./Utils/*"]
     }
   }
 }

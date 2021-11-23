@@ -15,6 +15,6 @@ const store: Store = {
 
 const storeContext = createContext(store);
 
-export default function useStor() {
+export default function useStore() {
   return useContext(storeContext);
 }
