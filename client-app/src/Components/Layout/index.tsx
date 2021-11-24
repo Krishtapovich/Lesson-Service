@@ -6,9 +6,11 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import { NavLink, useLocation } from "react-router-dom";
 
+import { color, content, drawer, listItem, navLink } from "./style";
+
 const routes = [
   {
-    to: "/surveys",
+    to: "/",
     icon: <QuizIcon />,
     text: "Surveys"
   },
@@ -22,17 +24,11 @@ const routes = [
 export default function Layout(props: React.PropsWithChildren<{}>) {
   const { pathname } = useLocation();
 
-  const isActive = (path: string) => pathname === path;
-  const color = (path: string) => (isActive(path) ? "primary.main" : "primary.light");
-
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box>
       <Drawer
         PaperProps={{
-          sx: {
-            width: 230,
-            backgroundColor: "primary.dark"
-          }
+          sx: drawer
         }}
         variant="permanent"
         anchor="left"
@@ -40,32 +36,17 @@ export default function Layout(props: React.PropsWithChildren<{}>) {
         <List>
           {routes.map((route) => (
             <>
-              <NavLink to={route.to} style={{ textDecoration: "none" }}>
-                <ListItem
-                  button
-                  sx={{
-                    backgroundColor: isActive(route.to) ? "rgba(255,255,255, 0.08)" : "none",
-                    color: color(route.to),
-                    borderRadius: 1,
-                    width: "90%",
-                    margin: "auto",
-                    marginBottom: 1,
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255, 0.08)"
-                    }
-                  }}
-                >
-                  <ListItemIcon sx={{ color: color(route.to) }}>{route.icon}</ListItemIcon>
-                  <ListItemText sx={{ color: color(route.to) }}>{route.text}</ListItemText>
+              <NavLink to={route.to} style={navLink}>
+                <ListItem button sx={listItem(pathname === route.to)}>
+                  <ListItemIcon sx={color(pathname === route.to)}>{route.icon}</ListItemIcon>
+                  <ListItemText sx={color(pathname === route.to)}>{route.text}</ListItemText>
                 </ListItem>
               </NavLink>
             </>
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ width: "calc(100% - 230px)", marginLeft: "230px" }}>
-        {props.children}
-      </Box>
+      <Box sx={content}>{props.children}</Box>
     </Box>
   );
 }

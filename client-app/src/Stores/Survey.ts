@@ -13,7 +13,7 @@ export default class SurveyStore {
   }
 
   async init() {
-    const surveys = await surveyService.getSurveys(1, 1);
+    const surveys = await surveyService.getSurveys(1, 20);
     runInAction(() => {
       this.surveys = surveys;
     });
@@ -40,6 +40,7 @@ export default class SurveyStore {
 
   async addSurvey(survey: SurveyCreateModel) {
     survey.id = uuid.v4.toString();
+    survey.creationTime = new Date().toISOString();
     const newSurvey = await surveyService.createSurvey(survey);
     runInAction(() => {
       this.surveys.push(newSurvey);

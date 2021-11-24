@@ -7,7 +7,7 @@ namespace Domain.Models.Survey
     {
         public Guid Id { get; set; }
         public bool IsClosed { get; set; }
-        public DateTime CreateionTime { get; set; } = DateTime.Now;
+        public DateTime CreationTime { get; set; }
         public ICollection<Question> Questions { get; set; }
     }
 
@@ -15,6 +15,7 @@ namespace Domain.Models.Survey
     {
         public Guid Id { get; set; }
         public bool isClosed { get; set; }
+        public DateTime CreationTime { get; set; }
         public ICollection<QuestionDto> Questions { get; set; }
     }
 

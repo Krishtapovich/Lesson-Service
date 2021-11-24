@@ -20,7 +20,7 @@ namespace Domain.Repositories.SurveyRepository
         {
             return await context.Surveys.Include(s => s.Questions)
                                         .ThenInclude(q => q.Options)
-                                        .OrderBy(s => s.CreateionTime)
+                                        .OrderBy(s => s.CreationTime)
                                         .Skip((pageNumber - 1) * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync();
