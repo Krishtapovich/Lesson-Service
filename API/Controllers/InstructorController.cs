@@ -48,7 +48,7 @@ namespace API.Controllers
         }
 
         [HttpPost("send-survey")]
-        public async ValueTask<IActionResult> SendSurveyAsync([FromBody] SurveyToGroup survey)
+        public async ValueTask<IActionResult> SendSurveyAsync([FromBody] SurveyToGroups survey)
         {
             await messageService.SendSurveyAsync(survey);
             await instructorService.ChangeSurveyStatusAsync(survey.Id, true);

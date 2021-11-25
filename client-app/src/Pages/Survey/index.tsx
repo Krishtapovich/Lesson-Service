@@ -34,6 +34,7 @@ function SurveyPage() {
       <Box sx={surveyBlock}>
         {surveys.map((s) => (
           <SurveyCard
+            key={s.id}
             sx={card}
             survey={s}
             detailsCallback={() => setSurvey(s)}
@@ -48,12 +49,11 @@ function SurveyPage() {
             {survey.questions.map((q, i) => (
               <Box key={q.id}>
                 <Typography sx={question}>{`${i + 1}. ${q.text}`}</Typography>
-                {q.options &&
-                  q.options.map((o) => (
-                    <Typography key={o.id} sx={option(o.isCorrect)}>
-                      {o.text}
-                    </Typography>
-                  ))}
+                {q.options?.map((o) => (
+                  <Typography key={o.id} sx={option(o.isCorrect)}>
+                    {o.text}
+                  </Typography>
+                ))}
               </Box>
             ))}
           </CardContent>

@@ -5,6 +5,6 @@ namespace Domain.Models.Student
         public long Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public long GroupNumber { get; set; }
+        public string GroupNumber { get; set; }
     }
 }

@@ -8,11 +8,11 @@ namespace API.Services.InstructorService
 {
     public interface IInstructorService
     {
-        Task<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize);
-        Task<IEnumerable<SurveyDto>> GetSurveysAsync(int pageNumber, int pageSize);
-        Task<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId);
-        Task<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto);
-        Task DeleteSurveyAsync(Guid surveyId);
-        Task ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
+        ValueTask<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize);
+        ValueTask<IEnumerable<SurveyDto>> GetSurveysAsync(int pageNumber, int pageSize);
+        ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId);
+        ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto);
+        ValueTask DeleteSurveyAsync(Guid surveyId);
+        ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
     }
 }

@@ -25,35 +25,35 @@ namespace API.Services.InstructorService
             this.mapper = mapper;
         }
 
-        public async Task<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize)
+        public async ValueTask<IEnumerable<Group>> GetGroupsAsync(int pageNumber, int pageSize)
         {
             return await studentRepository.GetGroupsAsync(pageNumber, pageSize);
         }
 
-        public async Task<IEnumerable<SurveyDto>> GetSurveysAsync(int pageNumber, int pageSize)
+        public async ValueTask<IEnumerable<SurveyDto>> GetSurveysAsync(int pageNumber, int pageSize)
         {
             var surveys = await surveyRepository.GetSurveysAsync(pageNumber, pageSize);
             return mapper.Map<IEnumerable<SurveyDto>>(surveys);
         }
 
-        public async Task<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId)
+        public async ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
             var answers = await surveyRepository.GetStudentAnswersAsync(surveyId, studentId);
             return mapper.Map<IEnumerable<AnswerDto>>(answers);
         }
 
-        public async Task ChangeSurveyStatusAsync(Guid surveyId, bool isOpened)
+        public async ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened)
         {
             await surveyRepository.ChangeSurveyStatusAsync(surveyId, isOpened);
         }
 
-        public async Task<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto)
+        public async ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto)
         {
             var newSurvey = await surveyRepository.AddSurveyAsync(mapper.Map<Survey>(surveyDto));
             return mapper.Map<SurveyDto>(newSurvey);
         }
 
-        public async Task DeleteSurveyAsync(Guid surveyId)
+        public async ValueTask DeleteSurveyAsync(Guid surveyId)
         {
             var images = await surveyRepository.GetAnswersImagesAsync(surveyId);
             foreach (var image in images)

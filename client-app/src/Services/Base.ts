@@ -10,7 +10,8 @@ class BaseService {
   protected requests = {
     get: <T>(url: string, params = {}) => axios.get<T>(url, { params }).then(this.responseData),
     post: <T>(url: string, body: {}) => axios.post<T>(url, body).then(this.responseData),
-    put: <T>(url: string, params: {}) => axios.put<T>(url, { params }).then(this.responseData),
+    put: <T>(url: string, body: {}, params: {}) =>
+      axios.put<T>(url, body, { params }).then(this.responseData),
     delete: <T>(url: string, params: {}) => axios.delete<T>(url, { params }).then(this.responseData)
   };
 }

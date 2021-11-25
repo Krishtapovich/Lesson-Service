@@ -1,5 +1,5 @@
 import AnswerModel from "@Models/Answer";
-import { SurveyCreateModel, SurveyModel, SurveyToGroupModel } from "@Models/Survey";
+import { SurveyCreateModel, SurveyModel, SurveyToGroups } from "@Models/Survey";
 import surveyService from "@Services/Survey";
 import { makeAutoObservable, runInAction } from "mobx";
 import uuid from "uuid";
@@ -47,7 +47,7 @@ export default class SurveyStore {
     });
   }
 
-  sendSurvey(survey: SurveyToGroupModel) {
+  sendSurvey(survey: SurveyToGroups) {
     surveyService.sendSurveyToGroup(survey);
   }
 

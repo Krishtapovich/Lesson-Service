@@ -19,10 +19,10 @@ namespace Domain.Models.Survey
         public ICollection<QuestionDto> Questions { get; set; }
     }
 
-    public class SurveyToGroup
+    public class SurveyToGroups
     {
         public Guid Id { get; set; }
-        public long GroupNumber { get; set; }
+        public IEnumerable<string> Groups { get; set; }
         public int? OpenPeriod { get; set; }
     }
 }

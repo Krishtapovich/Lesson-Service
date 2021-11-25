@@ -1,5 +1,5 @@
 import AnswerModel from "@Models/Answer";
-import { SurveyCreateModel, SurveyModel, SurveyToGroupModel } from "@Models/Survey";
+import { SurveyCreateModel, SurveyModel, SurveyToGroups } from "@Models/Survey";
 
 import BaseService from "./Base";
 
@@ -19,12 +19,12 @@ class SurveyService extends BaseService {
     return this.requests.post<SurveyModel>("instructor/create-survey", survey);
   }
 
-  sendSurveyToGroup(survey: SurveyToGroupModel) {
+  sendSurveyToGroup(survey: SurveyToGroups) {
     this.requests.post<void>("instructor/send-survey", survey);
   }
 
   closeSurvey(surveyId: string) {
-    this.requests.put<void>("instructor/close-survey", { surveyId });
+    this.requests.put<void>("instructor/close-survey", {}, { surveyId });
   }
 
   deleteSurvey(surveyId: string) {

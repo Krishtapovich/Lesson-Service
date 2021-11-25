@@ -35,9 +35,9 @@ namespace API.Services.BotServices.MessageService
             catch (Exception) { }
         }
 
-        public async ValueTask SendSurveyAsync(SurveyToGroup survey)
+        public async ValueTask SendSurveyAsync(SurveyToGroups survey)
         {
-            await botClient.SendSurveyToGroupAsync(survey);
+            await botClient.SendSurveyToGroupsAsync(survey);
         }
 
         public async ValueTask CloseSurveyPollsAsync(Guid surveyId)

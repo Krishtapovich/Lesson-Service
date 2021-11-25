@@ -2,7 +2,7 @@ import { SurveyModel } from "@Models/Survey";
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
-import { card, id, status, date } from "./style";
+import { card, date, id, status } from "./style";
 
 interface Props {
   survey: SurveyModel;
@@ -13,7 +13,7 @@ interface Props {
 }
 
 function SurveyCard(props: Props) {
-  const { survey, detailsCallback, deleteCallback, sx } = props;
+  const { survey, detailsCallback, closeCallback, deleteCallback, sx } = props;
   const style = { ...card, ...sx };
 
   return (
@@ -24,7 +24,7 @@ function SurveyCard(props: Props) {
         <Typography sx={date}>Creation Date: {survey.creationTime}</Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" color="warning" disabled={!survey.isClosed}>
+        <Button size="small" color="warning" disabled={survey.isClosed} onClick={closeCallback}>
           Close
         </Button>
         <Button size="small" sx={{ color: "white" }} onClick={detailsCallback}>

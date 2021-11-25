@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Application.Bot
         private readonly ISurveyRepository surveyRepository;
         private readonly ICloudStorage cloud;
 
-        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository, 
+        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository,
             ISurveyRepository surveyRepository, ICloudStorage cloud)
         {
             this.bot = bot;
@@ -123,17 +124,21 @@ namespace Application.Bot
             }
         }
 
-        public async ValueTask SendSurveyToGroupAsync(SurveyToGroup survey)
+        public async ValueTask SendSurveyToGroupsAsync(SurveyToGroups survey)
         {
-            var students = await studentRepository.GetGroupStudentsAsync(survey.GroupNumber);
-            var questions = await surveyRepository.GetSurveyQuestionsAsync(survey.Id);
-
-            foreach (var student in students)
+            foreach (var group in survey.Groups)
             {
-                foreach (var question in questions)
+                var students = await studentRepository.GetGroupStudentsAsync(group);
+                var questions = await surveyRepository.GetSurveyQuestionsAsync(survey.Id);
+
+                foreach (var student in students)
                 {
-                    var questionMessage = await SendQuestionAsync(student, question, survey.OpenPeriod);
-                    await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
+                    foreach (var question in questions)
+                    {
+                        var questionMessage = await SendQuestionAsync(student, question, survey.OpenPeriod);
+                        await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
+                    }
+
                 }
             }
         }
@@ -176,7 +181,7 @@ namespace Application.Bot
                 Id = message.Chat.Id,
                 FirstName = data[0],
                 LastName = data[1],
-                GroupNumber = long.Parse(data[2])
+                GroupNumber = data[2]
             };
 
             var isAuthorized = await studentRepository.CheckIfAuthorizedAsync(message.Chat.Id);

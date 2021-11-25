@@ -55,7 +55,7 @@ namespace Domain.Repositories.StudentRepository
             await context.SaveChangesAsync();
         }
 
-        private async ValueTask<Group> GetGroupAsync(long groupNumber)
+        private async ValueTask<Group> GetGroupAsync(string groupNumber)
         {
             var group = await context.Groups.Include(g => g.Students).FirstOrDefaultAsync(g => g.Number == groupNumber);
             if (group is null)
@@ -63,9 +63,9 @@ namespace Domain.Repositories.StudentRepository
             return group;
         }
 
-        public async ValueTask<IEnumerable<Student>> GetGroupStudentsAsync(long groupNumber)
+        public async ValueTask<IEnumerable<Student>> GetGroupStudentsAsync(string groupNumber)
         {
-            return (await context.Groups.Include(g => g.Students).FirstAsync(g => g.Number == groupNumber)).Students;
+            return await context.Students.Where(s => s.GroupNumber == groupNumber).ToListAsync();
         }
     }
 }

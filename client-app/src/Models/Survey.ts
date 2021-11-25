@@ -13,8 +13,8 @@ export interface SurveyCreateModel {
   questions: Array<QuestionCreateModel>;
 }
 
-export interface SurveyToGroupModel {
+export interface SurveyToGroups {
   id: string;
-  groupNumber: number;
+  groups: Array<string>;
   openPeriod?: number;
 }
