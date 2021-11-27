@@ -8,7 +8,7 @@ namespace API.Services.BotServices.MessageService
     public interface IMessageService
     {
         ValueTask HandleUpdateAsync(Update update);
-        ValueTask SendSurveyAsync(SurveyToGroups survey);
+        ValueTask SendSurveyAsync(SurveySendingModel survey);
         ValueTask CloseSurveyPollsAsync(Guid surveyId);
     }
 }

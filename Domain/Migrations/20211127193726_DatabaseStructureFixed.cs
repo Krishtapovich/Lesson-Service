@@ -3,60 +3,60 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Domain.Migrations
 {
-    public partial class DatabaseStructure : Migration
+    public partial class DatabaseStructureFixed : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Groups",
+                name: "Group",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Number = table.Column<long>(type: "INTEGER", nullable: false)
+                    Number = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.PrimaryKey("PK_Group", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Surveys",
+                name: "Survey",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreateionTime = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Surveys", x => x.Id);
+                    table.PrimaryKey("PK_Survey", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "Student",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: true),
                     LastName = table.Column<string>(type: "TEXT", nullable: true),
-                    GroupNumber = table.Column<long>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: true)
+                    GroupNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    GroupModelId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.PrimaryKey("PK_Student", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Students_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
+                        name: "FK_Student_Group_GroupModelId",
+                        column: x => x.GroupModelId,
+                        principalTable: "Group",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Questions",
+                name: "Question",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -66,17 +66,17 @@ namespace Domain.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Questions", x => x.Id);
+                    table.PrimaryKey("PK_Question", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Questions_Surveys_SurveyId",
+                        name: "FK_Question_Survey_SurveyId",
                         column: x => x.SurveyId,
-                        principalTable: "Surveys",
+                        principalTable: "Survey",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Options",
+                name: "Option",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -87,17 +87,17 @@ namespace Domain.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Options", x => x.Id);
+                    table.PrimaryKey("PK_Option", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Options_Questions_QuestionId",
+                        name: "FK_Option_Question_QuestionId",
                         column: x => x.QuestionId,
-                        principalTable: "Questions",
+                        principalTable: "Question",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "QuestionMessages",
+                name: "QuestionMessage",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -109,23 +109,17 @@ namespace Domain.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_QuestionMessages", x => x.Id);
+                    table.PrimaryKey("PK_QuestionMessage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_QuestionMessages_Questions_QuestionId",
+                        name: "FK_QuestionMessage_Question_QuestionId",
                         column: x => x.QuestionId,
-                        principalTable: "Questions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_QuestionMessages_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
+                        principalTable: "Question",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Answers",
+                name: "Answer",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -137,23 +131,23 @@ namespace Domain.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Answers", x => x.Id);
+                    table.PrimaryKey("PK_Answer", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Answers_Options_OptionId",
+                        name: "FK_Answer_Option_OptionId",
                         column: x => x.OptionId,
-                        principalTable: "Options",
+                        principalTable: "Option",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Answers_QuestionMessages_QuestionMessageId",
+                        name: "FK_Answer_QuestionMessage_QuestionMessageId",
                         column: x => x.QuestionMessageId,
-                        principalTable: "QuestionMessages",
+                        principalTable: "QuestionMessage",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Images",
+                name: "Image",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -164,82 +158,78 @@ namespace Domain.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Images", x => x.Id);
+                    table.PrimaryKey("PK_Image", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Images_Answers_AnswerId",
+                        name: "FK_Image_Answer_AnswerId",
                         column: x => x.AnswerId,
-                        principalTable: "Answers",
+                        principalTable: "Answer",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Answers_OptionId",
-                table: "Answers",
+                name: "IX_Answer_OptionId",
+                table: "Answer",
                 column: "OptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Answers_QuestionMessageId",
-                table: "Answers",
-                column: "QuestionMessageId");
+                name: "IX_Answer_QuestionMessageId",
+                table: "Answer",
+                column: "QuestionMessageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Images_AnswerId",
-                table: "Images",
+                name: "IX_Image_AnswerId",
+                table: "Image",
                 column: "AnswerId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Options_QuestionId",
-                table: "Options",
+                name: "IX_Option_QuestionId",
+                table: "Option",
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QuestionMessages_QuestionId",
-                table: "QuestionMessages",
-                column: "QuestionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_QuestionMessages_StudentId",
-                table: "QuestionMessages",
-                column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Questions_SurveyId",
-                table: "Questions",
+                name: "IX_Question_SurveyId",
+                table: "Question",
                 column: "SurveyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_GroupId",
-                table: "Students",
-                column: "GroupId");
+                name: "IX_QuestionMessage_QuestionId",
+                table: "QuestionMessage",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Student_GroupModelId",
+                table: "Student",
+                column: "GroupModelId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Images");
+                name: "Image");
 
             migrationBuilder.DropTable(
-                name: "Answers");
+                name: "Student");
 
             migrationBuilder.DropTable(
-                name: "Options");
+                name: "Answer");
 
             migrationBuilder.DropTable(
-                name: "QuestionMessages");
+                name: "Group");
 
             migrationBuilder.DropTable(
-                name: "Questions");
+                name: "Option");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "QuestionMessage");
 
             migrationBuilder.DropTable(
-                name: "Surveys");
+                name: "Question");
 
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "Survey");
         }
     }
 }

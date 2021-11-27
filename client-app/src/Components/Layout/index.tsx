@@ -26,23 +26,15 @@ export default function Layout(props: React.PropsWithChildren<{}>) {
 
   return (
     <Box>
-      <Drawer
-        PaperProps={{
-          sx: drawer
-        }}
-        variant="permanent"
-        anchor="left"
-      >
+      <Drawer PaperProps={{ sx: drawer }} variant="permanent" anchor="left">
         <List>
           {routes.map((route) => (
-            <>
-              <NavLink to={route.to} style={navLink}>
-                <ListItem button sx={listItem(pathname === route.to)}>
-                  <ListItemIcon sx={color(pathname === route.to)}>{route.icon}</ListItemIcon>
-                  <ListItemText sx={color(pathname === route.to)}>{route.text}</ListItemText>
-                </ListItem>
-              </NavLink>
-            </>
+            <NavLink to={route.to} style={navLink} key={route.to}>
+              <ListItem button sx={listItem(pathname === route.to)}>
+                <ListItemIcon sx={color(pathname === route.to)}>{route.icon}</ListItemIcon>
+                <ListItemText sx={color(pathname === route.to)}>{route.text}</ListItemText>
+              </ListItem>
+            </NavLink>
           ))}
         </List>
       </Drawer>

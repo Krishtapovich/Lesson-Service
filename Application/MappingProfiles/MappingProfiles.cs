@@ -6,16 +6,17 @@ namespace Application.MappingProfiles
     {
         public MappingProfiles()
         {
-            CreateMap<SurveyDto, Survey>();
-            CreateMap<Survey, SurveyDto>();
+            CreateMap<SurveyDto, SurveyModel>();
+            CreateMap<SurveyModel, SurveyDto>();
+            CreateMap<SurveyModel, SurveyListModel>();
 
-            CreateMap<QuestionDto, Question>();
-            CreateMap<Question, QuestionDto>();
+            CreateMap<QuestionDto, QuestionModel>();
+            CreateMap<QuestionModel, QuestionDto>();
 
-            CreateMap<OptionDto, Option>();
-            CreateMap<Option, OptionDto>();
+            CreateMap<OptionDto, OptionModel>();
+            CreateMap<OptionModel, OptionDto>();
 
-            CreateMap<Answer, AnswerDto>().ForMember(a => a.ImageUrl, o => o.MapFrom(a => a.Image.Url));
+            CreateMap<AnswerModel, AnswerDto>().ForMember(a => a.ImageUrl, o => o.MapFrom(a => a.Image.Url));
         }
     }
 }

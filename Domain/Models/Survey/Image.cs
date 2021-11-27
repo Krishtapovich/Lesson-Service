@@ -1,12 +1,15 @@
-﻿namespace Domain.Models.Survey
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Models.Survey
 {
-    public class Image
+    [Table("Image")]
+    public class ImageModel
     {
         public int Id { get; set; }
         public string FileName { get; set; }
         public string Url { get; set; }
 
         public int AnswerId { get; set; }
-        public Answer Answer { get; set; }
+        public AnswerModel Answer { get; set; }
     }
 }

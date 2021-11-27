@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.CloudStorage;
 using Application.Constants;
-using Domain.Models.Student;
+using Domain.Models.Group;
 using Domain.Models.Survey;
-using Domain.Repositories.StudentRepository;
+using Domain.Repositories.GroupRepository;
 using Domain.Repositories.SurveyRepository;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -18,15 +17,15 @@ namespace Application.Bot
     public class BotClient
     {
         private readonly ITelegramBotClient bot;
-        private readonly IStudentRepository studentRepository;
+        private readonly IGroupRepository groupRepository;
         private readonly ISurveyRepository surveyRepository;
         private readonly ICloudStorage cloud;
 
-        public BotClient(ITelegramBotClient bot, IStudentRepository studentRepository,
+        public BotClient(ITelegramBotClient bot, IGroupRepository groupRepository,
             ISurveyRepository surveyRepository, ICloudStorage cloud)
         {
             this.bot = bot;
-            this.studentRepository = studentRepository;
+            this.groupRepository = groupRepository;
             this.surveyRepository = surveyRepository;
             this.cloud = cloud;
         }
@@ -124,11 +123,11 @@ namespace Application.Bot
             }
         }
 
-        public async ValueTask SendSurveyToGroupsAsync(SurveyToGroups survey)
+        public async ValueTask SendSurveyToGroupsAsync(SurveySendingModel survey)
         {
             foreach (var group in survey.Groups)
             {
-                var students = await studentRepository.GetGroupStudentsAsync(group);
+                var students = await groupRepository.GetGroupStudentsAsync(group);
                 var questions = await surveyRepository.GetSurveyQuestionsAsync(survey.Id);
 
                 foreach (var student in students)
@@ -143,7 +142,7 @@ namespace Application.Bot
             }
         }
 
-        private async ValueTask<QuestionMessage> SendQuestionAsync(Student student, Question question, int? openPeriod = null)
+        private async ValueTask<QuestionMessage> SendQuestionAsync(StudentModel student, QuestionModel question, int? openPeriod = null)
         {
             Message message;
             if (question.Options.Any())
@@ -161,14 +160,13 @@ namespace Application.Bot
                 QuestionId = question.Id,
                 Question = question,
                 StudentId = student.Id,
-                Student = student,
                 PollId = message.Poll?.Id
             };
         }
 
         private async ValueTask GetDataAsync(long chatId, bool isUpdatingData)
         {
-            var flag = !isUpdatingData && await studentRepository.CheckIfAuthorizedAsync(chatId);
+            var flag = !isUpdatingData && await groupRepository.CheckIfAuthorizedAsync(chatId);
             await (flag ? bot.SendTextMessageAsync(chatId, BotConstants.Authorized)
                         : bot.SendTextMessageAsync(chatId, BotConstants.ReceiveData));
         }
@@ -176,7 +174,7 @@ namespace Application.Bot
         private async ValueTask ParseDataAsync(Message message)
         {
             var data = message.Text.Split("\n");
-            var student = new Student
+            var student = new StudentModel
             {
                 Id = message.Chat.Id,
                 FirstName = data[0],
@@ -184,8 +182,16 @@ namespace Application.Bot
                 GroupNumber = data[2]
             };
 
-            var isAuthorized = await studentRepository.CheckIfAuthorizedAsync(message.Chat.Id);
-            await (isAuthorized ? studentRepository.UpdateStudentAsync(student) : studentRepository.AddStudentAsync(student));
+            var isAuthorized = await groupRepository.CheckIfAuthorizedAsync(message.Chat.Id);
+            if (isAuthorized)
+            {
+                await groupRepository.UpdateStudentAsync(student);
+                await surveyRepository.DeleteStudentSurveyInfoAsync(student.Id);
+            }
+            else
+            {
+                await groupRepository.AddStudentAsync(student);
+            }
 
             var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { BotConstants.Update }) { ResizeKeyboard = true };
             await bot.SendTextMessageAsync(message.Chat.Id, BotConstants.DataSaved, replyMarkup: replyButton);

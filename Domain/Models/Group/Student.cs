@@ -1,6 +1,9 @@
-namespace Domain.Models.Student
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Models.Group
 {
-    public class Student
+    [Table("Student")]
+    public class StudentModel
     {
         public long Id { get; set; }
         public string FirstName { get; set; }

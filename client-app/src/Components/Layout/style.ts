@@ -1,13 +1,13 @@
-import { SxProps, Theme } from "@mui/system";
+import { SxProps } from "@mui/system";
 import { colors } from "@Utils/Theme";
 import React from "react";
 
-export const drawer: SxProps<Theme> = {
+export const drawer: SxProps = {
   width: "18%",
   backgroundColor: colors.drawer
 };
 
-export const listItem = (isActive: boolean): SxProps<Theme> => {
+export const listItem = (isActive: boolean): SxProps => {
   return {
     backgroundColor: isActive ? "rgba(255,255,255, 0.08)" : "none",
     color: isActive ? colors.primary : "white",
@@ -21,7 +21,7 @@ export const listItem = (isActive: boolean): SxProps<Theme> => {
   };
 };
 
-export const color = (isActive: boolean): SxProps<Theme> => {
+export const color = (isActive: boolean): SxProps => {
   return {
     color: isActive ? colors.primary : "white"
   };
@@ -31,7 +31,7 @@ export const navLink: React.CSSProperties = {
   textDecoration: "none"
 };
 
-export const content: SxProps<Theme> = {
+export const content: SxProps = {
   width: "82%",
   marginLeft: "18%",
   minHeight: "100vh",

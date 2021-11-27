@@ -1,16 +1,18 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Models.Survey
 {
-    public class Answer
+    [Table("Answer")]
+    public class AnswerModel
     {
         public int Id { get; set; }
         public Guid SurveyId { get; set; }
         public string Text { get; set; }
-        public Image Image { get; set; }
+        public ImageModel Image { get; set; }
 
         public int? OptionId { get; set; }
-        public Option Option { get; set; }
+        public OptionModel Option { get; set; }
 
         public int QuestionMessageId { get; set; }
         public QuestionMessage QuestionMessage { get; set; }
@@ -19,7 +21,7 @@ namespace Domain.Models.Survey
     public class AnswerDto
     {
         public int Id { get; set; }
-        public Option Option { get; set; }
+        public OptionModel Option { get; set; }
         public string Text { get; set; }
         public string ImageUrl { get; set; }
     }

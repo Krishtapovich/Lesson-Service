@@ -1,5 +1,8 @@
-﻿namespace Domain.Models.Survey
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Models.Survey
 {
+    [Table("QuestionMessage")]
     public class QuestionMessage
     {
         public int Id { get; set; }
@@ -7,9 +10,8 @@
         public string PollId { get; set; }
 
         public long StudentId { get; set; }
-        public Student.Student Student { get; set; }
 
         public int QuestionId { get; set; }
-        public Question Question { get; set; }
+        public QuestionModel Question { get; set; }
     }
 }

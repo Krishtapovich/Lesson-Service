@@ -1,10 +1,11 @@
 using API.Services.BotServices;
 using API.Services.BotServices.MessageService;
-using API.Services.InstructorService;
+using API.Services.GroupService;
+using API.Services.SurveyService;
 using API.Services.TimerService;
 using Application.CloudStorage;
 using Application.MappingProfiles;
-using Domain.Repositories.StudentRepository;
+using Domain.Repositories.GroupRepository;
 using Domain.Repositories.SurveyRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,11 +35,12 @@ namespace API.Extensions
             services.AddHttpClient("tgwebhook").AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botConfiguration.Token, client));
 
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
-            services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IGroupRepository, GroupRepository>();
             services.AddScoped<ISurveyRepository, SurveyRepository>();
 
             services.AddScoped<IMessageService, MessageService>();
-            services.AddScoped<IInstructorService, InstructorService>();
+            services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<ISurveyService, SurveyService>();
 
             services.AddSingleton<ITimerService, TimerService>();
             services.AddHostedService(provider => provider.GetService<ITimerService>());

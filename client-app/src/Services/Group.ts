@@ -4,7 +4,11 @@ import BaseService from "./Base";
 
 class GroupService extends BaseService {
   getGroups(pageNumber: number, pageSize: number) {
-    return this.requests.get<Array<GroupModel>>("instructor/groups", { pageNumber, pageSize });
+    return this.requests.get<Array<GroupModel>>("group/groups-list", { pageNumber, pageSize });
+  }
+
+  getGroupsNumbers() {
+    return this.requests.get<Array<string>>("group/groups-numbers");
   }
 }
 

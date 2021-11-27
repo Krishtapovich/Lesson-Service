@@ -16,17 +16,15 @@ namespace Domain.Repositories.SurveyRepository
             this.context = context;
         }
 
-        public async ValueTask<IEnumerable<Survey>> GetSurveysAsync(int pageNumber, int pageSize)
+        public async ValueTask<IEnumerable<SurveyModel>> GetSurveysAsync(int pageNumber, int pageSize)
         {
-            return await context.Surveys.Include(s => s.Questions)
-                                        .ThenInclude(q => q.Options)
-                                        .OrderBy(s => s.CreationTime)
+            return await context.Surveys.OrderBy(s => s.CreationTime)
                                         .Skip((pageNumber - 1) * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync();
         }
 
-        public async ValueTask<Survey> AddSurveyAsync(Survey survey)
+        public async ValueTask<SurveyModel> AddSurveyAsync(SurveyModel survey)
         {
             var newSurvey = await context.Surveys.AddAsync(survey);
             await context.SaveChangesAsync();
@@ -75,13 +73,13 @@ namespace Domain.Repositories.SurveyRepository
 
 
 
-        public async ValueTask<Image> GetAnswerImageAsync(int messageId)
+        public async ValueTask<ImageModel> GetAnswerImageAsync(int messageId)
         {
             var message = await context.Answers.Include(a => a.Image).FirstOrDefaultAsync(a => a.QuestionMessageId == messageId);
             return message?.Image;
         }
 
-        public async ValueTask<IEnumerable<Image>> GetAnswersImagesAsync(Guid surveyId)
+        public async ValueTask<IEnumerable<ImageModel>> GetAnswersImagesAsync(Guid surveyId)
         {
             var messages = await context.QuestionMessages.Include(qm => qm.Question).Where(qm => qm.Question.SurveyId == surveyId).ToListAsync();
             return await context.Answers.Include(a => a.Image)
@@ -107,9 +105,9 @@ namespace Domain.Repositories.SurveyRepository
 
 
 
-        public async ValueTask<ICollection<Question>> GetSurveyQuestionsAsync(Guid surveyId)
+        public async ValueTask<IEnumerable<QuestionModel>> GetSurveyQuestionsAsync(Guid surveyId)
         {
-            return (await context.Surveys.Include(s => s.Questions).ThenInclude(q => q.Options).FirstAsync(s => s.Id == surveyId)).Questions;
+            return await context.Questions.Include(q => q.Options).Where(q => q.SurveyId == surveyId).ToListAsync();
         }
 
         public async ValueTask<IEnumerable<QuestionMessage>> GetSurveyOptionQuestionsAsync(Guid surveyId)
@@ -140,7 +138,7 @@ namespace Domain.Repositories.SurveyRepository
 
 
 
-        public async ValueTask<IEnumerable<Answer>> GetStudentAnswersAsync(Guid surveyId, long studentId)
+        public async ValueTask<IEnumerable<AnswerModel>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
             return await context.Answers.Where(a => a.SurveyId == surveyId && a.QuestionMessage.StudentId == studentId)
                                         .Include(a => a.Option)
@@ -149,7 +147,7 @@ namespace Domain.Repositories.SurveyRepository
                                         .ToListAsync();
         }
 
-        public async ValueTask RegisterAnswerAsync(int messageId, string answerText = null, Image image = null)
+        public async ValueTask RegisterAnswerAsync(int messageId, string answerText = null, ImageModel image = null)
         {
             var message = await context.QuestionMessages.FirstAsync(qm => qm.MessageId == messageId);
             var question = await context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == message.QuestionId);
@@ -157,7 +155,7 @@ namespace Domain.Repositories.SurveyRepository
 
             if (answer is null)
             {
-                answer = new Answer
+                answer = new AnswerModel
                 {
                     SurveyId = question.SurveyId,
                     QuestionMessage = message,
@@ -187,7 +185,7 @@ namespace Domain.Repositories.SurveyRepository
 
             if (answer is null)
             {
-                answer = new Answer
+                answer = new AnswerModel
                 {
                     SurveyId = question.SurveyId,
                     QuestionMessage = message,
@@ -199,6 +197,14 @@ namespace Domain.Repositories.SurveyRepository
             {
                 answer.Option = option;
             }
+            await context.SaveChangesAsync();
+        }
+
+
+        public async ValueTask DeleteStudentSurveyInfoAsync(long studentId)
+        {
+            var questionMessages = await context.QuestionMessages.Where(qm => qm.StudentId == studentId).ToListAsync();
+            context.QuestionMessages.RemoveRange(questionMessages);
             await context.SaveChangesAsync();
         }
     }

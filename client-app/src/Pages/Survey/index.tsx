@@ -1,33 +1,34 @@
 import SurveyCard from "@Components/Cards/Survey";
-import { SurveyModel } from "@Models/Survey";
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import SurveySendingModal from "@Components/Modals/SurveySending";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import useStore from "@Stores";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
-import {
-  card,
-  option,
-  pageWrapper,
-  previewText,
-  question,
-  surveyBlock,
-  surveyPreview,
-  surveyQuestions
-} from "./style";
+import { card, option, pageWrapper, previewText, question, questionsView, surveyBlock, surveyPreview } from "./style";
 
 function SurveyPage() {
   const { surveyStore } = useStore();
-  const { surveys } = surveyStore;
+  const { surveys, surveyQuestions } = surveyStore;
 
-  const [survey, setSurvey] = useState<SurveyModel>();
+  const [id, setId] = useState<string>();
 
   useEffect(() => {
     surveyStore.init();
     return () => surveyStore.dispose();
   }, [surveyStore]);
 
-  const questionsView = { ...surveyPreview, ...surveyQuestions };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+  const detailsCallback = (surveyId: string) => {
+    setId(surveyId);
+    surveyStore.getSurveyQuestions(surveyId);
+  };
+
+  const sendSurvey = (groups: Array<string>, openPeriod?: number) => {
+    id && surveyStore.sendSurvey({ id, groups, openPeriod });
+  };
 
   return (
     <Box sx={pageWrapper}>
@@ -37,16 +38,16 @@ function SurveyPage() {
             key={s.id}
             sx={card}
             survey={s}
-            detailsCallback={() => setSurvey(s)}
+            detailsCallback={() => detailsCallback(s.id)}
             closeCallback={() => surveyStore.closeSruvey(s.id)}
             deleteCallback={() => surveyStore.deleteSurvey(s.id)}
           />
         ))}
       </Box>
-      {survey ? (
+      {surveyQuestions.length ? (
         <Card sx={questionsView}>
           <CardContent>
-            {survey.questions.map((q, i) => (
+            {surveyQuestions.map((q, i) => (
               <Box key={q.id}>
                 <Typography sx={question}>{`${i + 1}. ${q.text}`}</Typography>
                 {q.options?.map((o) => (
@@ -56,13 +57,19 @@ function SurveyPage() {
                 ))}
               </Box>
             ))}
+            <Button onClick={toggleModal}>Send</Button>
           </CardContent>
         </Card>
       ) : (
         <Box sx={surveyPreview}>
-          <Typography sx={previewText}>Click Details to see survey questions</Typography>
+          <Typography sx={previewText}>Click Details to see survey</Typography>
         </Box>
       )}
+      <SurveySendingModal
+        isOpen={isModalOpen}
+        handleClose={toggleModal}
+        sendCallback={sendSurvey}
+      />
     </Box>
   );
 }

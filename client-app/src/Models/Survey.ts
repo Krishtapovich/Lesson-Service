@@ -1,10 +1,9 @@
 import { QuestionCreateModel, QuestionModel } from "./Question";
 
-export interface SurveyModel {
+export interface SurveyListModel {
   id: string;
   isClosed: boolean;
   creationTime: Date;
-  questions: Array<QuestionModel>;
 }
 
 export interface SurveyCreateModel {
@@ -13,7 +12,7 @@ export interface SurveyCreateModel {
   questions: Array<QuestionCreateModel>;
 }
 
-export interface SurveyToGroups {
+export interface SurveySendingModel {
   id: string;
   groups: Array<string>;
   openPeriod?: number;

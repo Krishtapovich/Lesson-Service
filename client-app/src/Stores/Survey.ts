@@ -1,11 +1,13 @@
 import AnswerModel from "@Models/Answer";
-import { SurveyCreateModel, SurveyModel, SurveyToGroups } from "@Models/Survey";
+import { QuestionModel } from "@Models/Question";
+import { SurveyCreateModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
 import surveyService from "@Services/Survey";
 import { makeAutoObservable, runInAction } from "mobx";
 import uuid from "uuid";
 
 export default class SurveyStore {
-  surveys: Array<SurveyModel> = [];
+  surveys: Array<SurveyListModel> = [];
+  surveyQuestions: Array<QuestionModel> = [];
   studentAnswers: Array<AnswerModel> = [];
 
   constructor() {
@@ -14,41 +16,41 @@ export default class SurveyStore {
 
   async init() {
     const surveys = await surveyService.getSurveys(1, 20);
-    runInAction(() => {
-      this.surveys = surveys;
-    });
+    runInAction(() => (this.surveys = surveys));
   }
 
   dispose() {
     this.surveys = [];
     this.studentAnswers = [];
+    this.surveyQuestions = [];
   }
 
   async getSurveys(pageNumber: number, pageSize: number) {
     const surveys = await surveyService.getSurveys(pageNumber, pageSize);
-    runInAction(() => {
-      this.surveys.concat(surveys);
-    });
+    runInAction(() => this.surveys.concat(surveys));
+  }
+
+  async getSurveyQuestions(surveyId: string) {
+    const questions = await surveyService.getSurveyQuestions(surveyId);
+    console.log(questions);
+    runInAction(() => (this.surveyQuestions = questions));
   }
 
   async getStudentAnswers(surveyId: string, studentId: number) {
     const answers = await surveyService.getStudentAnswers(surveyId, studentId);
-    runInAction(() => {
-      this.studentAnswers = answers;
-    });
+    runInAction(() => (this.studentAnswers = answers));
   }
 
   async addSurvey(survey: SurveyCreateModel) {
     survey.id = uuid.v4.toString();
     survey.creationTime = new Date().toISOString();
     const newSurvey = await surveyService.createSurvey(survey);
-    runInAction(() => {
-      this.surveys.push(newSurvey);
-    });
+    runInAction(() => this.surveys.push(newSurvey));
   }
 
-  sendSurvey(survey: SurveyToGroups) {
-    surveyService.sendSurveyToGroup(survey);
+  sendSurvey(survey: SurveySendingModel) {
+    this.surveys = this.surveys.map((s) => (s.id === survey.id ? { ...s, isClosed: false } : s));
+    surveyService.sendSurveyToGroups(survey);
   }
 
   closeSruvey(surveyId: string) {
@@ -59,5 +61,6 @@ export default class SurveyStore {
   deleteSurvey(surveyId: string) {
     this.surveys = this.surveys.filter((s) => s.id !== surveyId);
     surveyService.deleteSurvey(surveyId);
+    this.surveyQuestions = [];
   }
 }

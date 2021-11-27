@@ -6,7 +6,7 @@ namespace Application.CloudStorage
 {
     public interface ICloudStorage
     {
-        ValueTask<Image> UploadImageAsync(string fileName, Stream file);
+        ValueTask<ImageModel> UploadImageAsync(string fileName, Stream file);
         ValueTask DeleteImageAsync(string fileName);
     }
 }

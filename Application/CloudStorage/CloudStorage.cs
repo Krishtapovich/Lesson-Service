@@ -20,10 +20,10 @@ namespace Application.CloudStorage
             bucketName = configuration["GoogleCloudStorageBucket"];
         }
 
-        public async ValueTask<Image> UploadImageAsync(string fileName, Stream file)
+        public async ValueTask<ImageModel> UploadImageAsync(string fileName, Stream file)
         {
             var data = await storageClient.UploadObjectAsync(bucketName, fileName, null, file);
-            return new Image { FileName = fileName, Url = data.MediaLink };
+            return new ImageModel { FileName = fileName, Url = data.MediaLink };
         }
 
         public async ValueTask DeleteImageAsync(string fileName)
