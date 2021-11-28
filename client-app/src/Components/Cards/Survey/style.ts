@@ -16,6 +16,12 @@ export const status: SxProps = {
   color: "whitesmoke"
 };
 
+export const title: SxProps = {
+  fontSize: 18,
+  fontWeight: 500,
+  color: "white"
+};
+
 export const date: SxProps = {
   fontSize: 17,
   fontWeight: 500,

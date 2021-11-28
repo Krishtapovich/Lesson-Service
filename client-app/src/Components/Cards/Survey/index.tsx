@@ -2,7 +2,7 @@ import { SurveyListModel } from "@Models/Survey";
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
-import { card, date, id, status, close, details } from "./style";
+import { card, date, id, title, status, close, details } from "./style";
 
 interface Props {
   survey: SurveyListModel;
@@ -24,6 +24,7 @@ function SurveyCard(props: Props) {
       <CardContent>
         <Typography sx={id}>{survey.id}</Typography>
         <Typography sx={status}>Status: {survey.isClosed ? "Closed" : "Open"}</Typography>
+        <Typography sx={title}>Title: {survey.title}</Typography>
         <Typography sx={date}>Creation Date: {creationDate.toLocaleString("ru-Ru")}</Typography>
       </CardContent>
       <CardActions>

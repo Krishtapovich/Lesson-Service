@@ -1,6 +1,6 @@
 import AnswerModel from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
-import { SurveyCreateModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
+import { SurveyCreateModel, SurveyFormModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
 import surveyService from "@Services/Survey";
 import { makeAutoObservable, runInAction } from "mobx";
 import uuid from "uuid";
@@ -32,7 +32,6 @@ export default class SurveyStore {
 
   async getSurveyQuestions(surveyId: string) {
     const questions = await surveyService.getSurveyQuestions(surveyId);
-    console.log(questions);
     runInAction(() => (this.surveyQuestions = questions));
   }
 
@@ -41,11 +40,14 @@ export default class SurveyStore {
     runInAction(() => (this.studentAnswers = answers));
   }
 
-  async addSurvey(survey: SurveyCreateModel) {
-    survey.id = uuid.v4.toString();
-    survey.creationTime = new Date().toISOString();
+  async addSurvey(formSurvey: SurveyFormModel) {
+    const survey: SurveyCreateModel = {
+      id: uuid.v4().toString(),
+      creationTime: new Date().toISOString(),
+      ...formSurvey
+    };
     const newSurvey = await surveyService.createSurvey(survey);
-    runInAction(() => this.surveys.push(newSurvey));
+    runInAction(() => (this.surveys = [newSurvey, ...this.surveys]));
   }
 
   sendSurvey(survey: SurveySendingModel) {

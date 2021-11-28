@@ -8,6 +8,7 @@ namespace Domain.Models.Survey
     public class SurveyModel
     {
         public Guid Id { get; set; }
+        public string Title { get; set; }
         public bool IsClosed { get; set; }
         public DateTime CreationTime { get; set; }
         public ICollection<QuestionModel> Questions { get; set; }
@@ -16,6 +17,7 @@ namespace Domain.Models.Survey
     public class SurveyDto
     {
         public Guid Id { get; set; }
+        public string Title { get; set; }
         public bool IsClosed { get; set; } = true;
         public DateTime CreationTime { get; set; }
         public ICollection<QuestionDto> Questions { get; set; }
@@ -24,6 +26,7 @@ namespace Domain.Models.Survey
     public class SurveyListModel
     {
         public Guid Id { get; set; }
+        public string Title { get; set; }
         public bool IsClosed { get; set; }
         public DateTime CreationTime { get; set; }
     }

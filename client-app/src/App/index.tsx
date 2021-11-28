@@ -1,14 +1,16 @@
 import "./index.css";
 
 import Layout from "@Components/Layout";
-import SurveyPage from "@Pages/Survey";
+import AllSurveysPage from "@Pages/AllSurveys";
+import SurveyCreationPage from "@Pages/SurveyCreation";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<SurveyPage />} />
+        <Route path="/" element={<AllSurveysPage />} />
+        <Route path="/survey-creation" element={<SurveyCreationPage />} />
         <Route path="/students" />
       </Routes>
     </Layout>

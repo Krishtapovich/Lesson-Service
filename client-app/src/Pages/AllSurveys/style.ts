@@ -2,11 +2,9 @@ import { SxProps } from "@mui/system";
 
 export const pageWrapper: SxProps = {
   padding: 3,
-  width: "95%",
   margin: "auto",
   display: "flex",
   flexDirection: "row",
-  maxHeight: "91vh",
   justifyContent: "space-between"
 };
 
@@ -32,7 +30,6 @@ export const card: SxProps = {
 
 export const surveyPreview: SxProps = {
   width: "60%",
-  height: "92vh",
   border: "2px dashed white",
   borderRadius: 3,
   overflow: "auto",
@@ -44,27 +41,4 @@ export const previewText: SxProps = {
   color: "white",
   margin: "auto",
   textAlign: "center"
-};
-
-export const surveyQuestions: SxProps = {
-  background: "linear-gradient(90deg, rgba(29, 187, 221, 0.46), rgba(51, 241, 111, 0.69))",
-  boxShadow: 5,
-  border: "0"
-};
-
-export const questionsView: SxProps = { ...surveyPreview, ...surveyQuestions };
-
-export const question: SxProps = {
-  fontSize: 23,
-  fontWeight: 600,
-  color: "white"
-};
-
-export const option = (isCorrect: boolean): SxProps => {
-  return {
-    fontSize: 18,
-    fontWeight: 500,
-    color: isCorrect ? "#3dff00" : "white",
-    marginLeft: 5
-  };
 };

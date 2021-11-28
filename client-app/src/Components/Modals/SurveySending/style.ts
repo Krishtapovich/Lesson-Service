@@ -68,6 +68,7 @@ export const sendButton: SxProps = {
   color: "#39aebd",
   borderRadius: 2,
   border: "2px solid #39aebd",
+  transition: "0.3s",
   "&:hover": {
     borderRadius: 2,
     border: "2px solid #39aebd",

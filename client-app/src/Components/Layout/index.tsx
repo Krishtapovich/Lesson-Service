@@ -1,18 +1,24 @@
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import GroupIcon from "@mui/icons-material/Group";
-import QuizIcon from "@mui/icons-material/Quiz";
+import ListIcon from "@mui/icons-material/List";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import { NavLink, useLocation } from "react-router-dom";
 
-import { color, content, drawer, listItem, navLink } from "./style";
+import { content, drawer, globalWrapper, listItem, navLink } from "./style";
 
 const routes = [
   {
     to: "/",
-    icon: <QuizIcon />,
-    text: "Surveys"
+    icon: <ListIcon />,
+    text: "All Surveys"
+  },
+  {
+    to: "/survey-creation",
+    icon: <AddCircleIcon />,
+    text: "Survey Creation"
   },
   {
     to: "/students",
@@ -25,14 +31,14 @@ export default function Layout(props: React.PropsWithChildren<{}>) {
   const { pathname } = useLocation();
 
   return (
-    <Box>
+    <Box sx={globalWrapper}>
       <Drawer PaperProps={{ sx: drawer }} variant="permanent" anchor="left">
         <List>
           {routes.map((route) => (
             <NavLink to={route.to} style={navLink} key={route.to}>
               <ListItem button sx={listItem(pathname === route.to)}>
-                <ListItemIcon sx={color(pathname === route.to)}>{route.icon}</ListItemIcon>
-                <ListItemText sx={color(pathname === route.to)}>{route.text}</ListItemText>
+                <ListItemIcon>{route.icon}</ListItemIcon>
+                <ListItemText>{route.text}</ListItemText>
               </ListItem>
             </NavLink>
           ))}

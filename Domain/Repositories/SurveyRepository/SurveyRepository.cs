@@ -18,7 +18,7 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask<IEnumerable<SurveyModel>> GetSurveysAsync(int pageNumber, int pageSize)
         {
-            return await context.Surveys.OrderBy(s => s.CreationTime)
+            return await context.Surveys.OrderByDescending(s => s.CreationTime)
                                         .Skip((pageNumber - 1) * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync();
