@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Models.Group;
 using Domain.Models.Survey;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +17,9 @@ namespace Domain.Repositories.SurveyRepository
             this.context = context;
         }
 
-        public async ValueTask<IEnumerable<SurveyModel>> GetSurveysAsync(int pageNumber, int pageSize)
+        public async ValueTask<IEnumerable<SurveyModel>> GetSurveysAsync()
         {
-            return await context.Surveys.OrderByDescending(s => s.CreationTime)
-                                        .Skip((pageNumber - 1) * pageSize)
-                                        .Take(pageSize)
-                                        .ToListAsync();
+            return await context.Surveys.OrderByDescending(s => s.CreationTime).ToListAsync();
         }
 
         public async ValueTask<SurveyModel> AddSurveyAsync(SurveyModel survey)
@@ -120,12 +118,11 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message)
         {
-            var question = await context.Questions.Include(q => q.Messages).FirstAsync(q => q.Id == questionId);
             var questionMessage = await context.QuestionMessages.FirstOrDefaultAsync(qm => qm.QuestionId == message.QuestionId &&
                                                                                            qm.StudentId == message.StudentId);
             if (questionMessage is null)
             {
-                question.Messages.Add(message);
+                await context.QuestionMessages.AddAsync(message);
             }
             else
             {
@@ -137,6 +134,17 @@ namespace Domain.Repositories.SurveyRepository
         }
 
 
+
+        public async ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId)
+        {
+            var r =  await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).Select(qm => qm.Student).Distinct().ToListAsync();
+            return r;
+        }
+
+        public async ValueTask<IEnumerable<AnswerModel>> GetSurveyAnswersAsync(Guid surveyId)
+        {
+            return await context.Answers.Where(a => a.SurveyId == surveyId).ToListAsync();
+        }
 
         public async ValueTask<IEnumerable<AnswerModel>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {

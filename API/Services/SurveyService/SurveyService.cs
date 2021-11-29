@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.CloudStorage;
 using AutoMapper;
+using Domain.Models.Group;
 using Domain.Models.Survey;
 using Domain.Repositories.SurveyRepository;
 
@@ -21,9 +22,9 @@ namespace API.Services.SurveyService
             this.mapper = mapper;
         }
 
-        public async ValueTask<IEnumerable<SurveyListModel>> GetSurveysAsync(int pageNumber, int pageSize)
+        public async ValueTask<IEnumerable<SurveyListModel>> GetSurveysAsync()
         {
-            var surveys = await surveyRepository.GetSurveysAsync(pageNumber, pageSize);
+            var surveys = await surveyRepository.GetSurveysAsync();
             return mapper.Map<IEnumerable<SurveyListModel>>(surveys);
         }
 
@@ -31,6 +32,11 @@ namespace API.Services.SurveyService
         {
             var questions = await surveyRepository.GetSurveyQuestionsAsync(surveyId);
             return mapper.Map<IEnumerable<QuestionDto>>(questions);
+        }
+
+        public async ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId)
+        {
+            return await surveyRepository.GetSurveyStudentsAsync(surveyId);
         }
 
         public async ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId)

@@ -22,6 +22,11 @@ export const title: SxProps = {
   fontWeight: 500
 };
 
+export const loader: SxProps = {
+  marginY: 3,
+  color: "#39aebd"
+};
+
 export const tableWrapper: SxProps = {
   marginTop: 1,
   marginBottom: 2,
@@ -93,7 +98,7 @@ export const TextInput = styled(TextField)`
     fieldset {
       border: 2px solid white;
     }
-    
+
     &:hover fieldset {
       border-color: white;
     }

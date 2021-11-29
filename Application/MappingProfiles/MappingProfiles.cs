@@ -16,7 +16,9 @@ namespace Application.MappingProfiles
             CreateMap<OptionDto, OptionModel>();
             CreateMap<OptionModel, OptionDto>();
 
-            CreateMap<AnswerModel, AnswerDto>().ForMember(a => a.ImageUrl, o => o.MapFrom(a => a.Image.Url));
+            CreateMap<AnswerModel, AnswerDto>()
+                .ForMember(a => a.ImageUrl, o => o.MapFrom(a => a.Image.Url))
+                .ForMember(a => a.Question, o => o.MapFrom(a => a.QuestionMessage.Question));
         }
     }
 }

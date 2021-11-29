@@ -4,7 +4,6 @@ export interface SurveyListModel {
   id: string;
   title: string;
   isClosed: boolean;
-  creationTime: Date;
 }
 
 export interface SurveyFormModel {
@@ -15,7 +14,6 @@ export interface SurveyFormModel {
 export interface SurveyCreateModel {
   id: string;
   title: string;
-  creationTime: string;
   questions: Array<QuestionCreateModel>;
 }
 

@@ -1,19 +1,21 @@
 import AnswerModel from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
+import StudentModel from "@Models/Student";
 import { SurveyCreateModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
 
 import BaseService from "./Base";
 
 class SurveyService extends BaseService {
-  getSurveys(pageNumber: number, pageSize: number) {
-    return this.requests.get<Array<SurveyListModel>>("survey/surveys-list", {
-      pageNumber,
-      pageSize
-    });
+  getSurveys() {
+    return this.requests.get<Array<SurveyListModel>>("survey/surveys-list");
   }
 
   getSurveyQuestions(surveyId: string) {
     return this.requests.get<Array<QuestionModel>>("survey/survey-questions", { surveyId });
+  }
+
+  getSurveyStudents(surveyId: string) {
+    return this.requests.get<Array<StudentModel>>("survey/survey-students", { surveyId });
   }
 
   getStudentAnswers(surveyId: string, studentId: number) {

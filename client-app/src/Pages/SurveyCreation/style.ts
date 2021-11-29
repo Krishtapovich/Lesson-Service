@@ -28,11 +28,12 @@ export const optionsContainer: SxProps = {
   width: "60%",
   maxHeight: 220,
   overflowY: "auto",
+  marginY: 2,
   "&::-webkit-scrollbar": {
     width: 4
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#8266c4",
+    backgroundColor: "#1c7483",
     borderRadius: 3
   }
 };
@@ -71,7 +72,6 @@ const addButton: SxProps = {
 
 export const addOption: SxProps = {
   marginLeft: "60%",
-  marginTop: 2,
   ...addButton
 };
 

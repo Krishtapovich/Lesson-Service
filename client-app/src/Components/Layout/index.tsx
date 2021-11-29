@@ -1,5 +1,4 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import GroupIcon from "@mui/icons-material/Group";
 import ListIcon from "@mui/icons-material/List";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -19,11 +18,6 @@ const routes = [
     to: "/survey-creation",
     icon: <AddCircleIcon />,
     text: "Survey Creation"
-  },
-  {
-    to: "/students",
-    icon: <GroupIcon />,
-    text: "Students"
   }
 ];
 

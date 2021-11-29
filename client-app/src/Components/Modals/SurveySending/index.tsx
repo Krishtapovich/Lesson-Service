@@ -1,3 +1,4 @@
+import LoadingWrapper from "@Components/LoadingWrapper";
 import {
   Box,
   Button,
@@ -9,13 +10,24 @@ import {
   TableHead,
   TableRow,
   TextFieldProps,
-  Typography,
+  Typography
 } from "@mui/material";
 import useStore from "@Stores";
+import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
 import NumberFormat from "react-number-format";
 
-import { checkbox, modal, sendButton, tableBodyCell, tableHeaderCell, tableWrapper, TextInput, title } from "./style";
+import {
+  checkbox,
+  modal,
+  sendButton,
+  tableBodyCell,
+  tableHeaderCell,
+  tableWrapper,
+  TextInput,
+  title,
+  loader
+} from "./style";
 
 interface Props {
   isOpen: boolean;
@@ -26,7 +38,7 @@ interface Props {
 function SurveySendingModal(props: Props) {
   const { isOpen, handleClose, sendCallback } = props;
   const { groupStore } = useStore();
-  const { groupsNumbers } = groupStore;
+  const { groupsNumbers, isLoading: isloading } = groupStore;
 
   useEffect(() => {
     groupStore.getGroupsNumbers();
@@ -75,36 +87,38 @@ function SurveySendingModal(props: Props) {
     <Modal open={isOpen} onClose={close}>
       <Box sx={modal}>
         <Typography sx={title}>Select groups</Typography>
-        <Box sx={tableWrapper}>
-          <Table stickyHeader padding="checkbox">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={tableHeaderCell}>
-                  <Checkbox sx={checkbox} onChange={handleAllSelected} />
-                </TableCell>
-                <TableCell sx={tableHeaderCell}>
-                  <Typography align="center">Number</Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {groupsNumbers.map((group) => (
-                <TableRow selected={checkSelection(group)} key={group}>
-                  <TableCell sx={tableBodyCell}>
-                    <Checkbox
-                      sx={checkbox}
-                      checked={checkSelection(group)}
-                      onChange={(e) => handleRowSelected(e, group)}
-                    />
+        <LoadingWrapper isLoading={isloading} sx={loader} size={"15%"}>
+          <Box sx={tableWrapper}>
+            <Table stickyHeader padding="checkbox">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={tableHeaderCell}>
+                    <Checkbox sx={checkbox} onChange={handleAllSelected} />
                   </TableCell>
-                  <TableCell align="center" sx={tableBodyCell}>
-                    {group}
+                  <TableCell sx={tableHeaderCell}>
+                    <Typography align="center">Number</Typography>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+              </TableHead>
+              <TableBody>
+                {groupsNumbers.map((group) => (
+                  <TableRow selected={checkSelection(group)} key={group}>
+                    <TableCell sx={tableBodyCell}>
+                      <Checkbox
+                        sx={checkbox}
+                        checked={checkSelection(group)}
+                        onChange={(e) => handleRowSelected(e, group)}
+                      />
+                    </TableCell>
+                    <TableCell align="center" sx={tableBodyCell}>
+                      {group}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        </LoadingWrapper>
         <NumberFormat
           customInput={PeriodInput}
           format="##:##:##"
@@ -119,7 +133,7 @@ function SurveySendingModal(props: Props) {
   );
 }
 
-export default SurveySendingModal;
+export default observer(SurveySendingModal);
 
 const PeriodInput: React.FC<TextFieldProps> = (props: TextFieldProps) => (
   <TextInput {...props} label="OpenPeriod" />

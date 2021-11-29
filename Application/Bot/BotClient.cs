@@ -158,8 +158,8 @@ namespace Application.Bot
             {
                 MessageId = message.MessageId,
                 QuestionId = question.Id,
-                Question = question,
                 StudentId = student.Id,
+                Student = student,
                 PollId = message.Poll?.Id
             };
         }

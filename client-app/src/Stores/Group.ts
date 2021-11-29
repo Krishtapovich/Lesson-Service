@@ -1,10 +1,13 @@
 import GroupModel from "@Models/Group";
 import groupService from "@Services/Group";
+import { LOAD_TIME } from "@Utils/Theme";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export default class GroupStore {
   groups: Array<GroupModel> = [];
   groupsNumbers: Array<string> = [];
+
+  isLoading = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -24,8 +27,14 @@ export default class GroupStore {
     runInAction(() => this.groups.concat(groups));
   }
 
-  async getGroupsNumbers() {
-    const groupsNumbers = await groupService.getGroupsNumbers();
-    runInAction(() => (this.groupsNumbers = groupsNumbers));
+  getGroupsNumbers() {
+    this.isLoading = true;
+    setTimeout(async () => {
+      const groupsNumbers = await groupService.getGroupsNumbers();
+      runInAction(() => {
+        this.groupsNumbers = groupsNumbers;
+        this.isLoading = false;
+      });
+    }, LOAD_TIME);
   }
 }

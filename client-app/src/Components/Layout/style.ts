@@ -7,7 +7,7 @@ export const globalWrapper: SxProps = {
 };
 
 export const drawer: SxProps = {
-  width: "18%",
+  width: "16%",
   backgroundColor: colors.drawer
 };
 
@@ -19,6 +19,9 @@ export const listItem = (isActive: boolean): SxProps => {
     width: "90%",
     margin: "auto",
     marginBottom: 1,
+    "& > div": {
+      minWidth: 35
+    },
     "&:hover": {
       backgroundColor: "rgba(255,255,255, 0.08)"
     },
@@ -35,8 +38,8 @@ export const navLink: React.CSSProperties = {
 export const content: SxProps = {
   padding: 0,
   height: "100%",
-  width: "82%",
-  marginLeft: "18%",
+  width: "84%",
+  marginLeft: "16%",
   background:
     "linear-gradient(90deg, rgba(34, 72, 110, 1) 3%, rgba(57, 177, 191, 1) 49%, rgba(51, 181, 153, 1) 91%)",
   "& > div": {
@@ -46,7 +49,7 @@ export const content: SxProps = {
       width: 8
     },
     "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "#8266c4",
+      backgroundColor: "#1c7483",
       borderRadius: 3
     }
   }

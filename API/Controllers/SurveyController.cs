@@ -24,15 +24,21 @@ namespace API.Controllers
         }
 
         [HttpGet("surveys-list")]
-        public async ValueTask<IActionResult> GetSurveysAsync(int pageNumber, int pageSize)
+        public async ValueTask<IActionResult> GetSurveysAsync()
         {
-            return Ok(await surveyService.GetSurveysAsync(pageNumber, pageSize));
+            return Ok(await surveyService.GetSurveysAsync());
         }
 
         [HttpGet("survey-questions")]
         public async ValueTask<IActionResult> GetSurveyQuestionsAsync(Guid surveyId)
         {
             return Ok(await surveyService.GetSurveyQuestionsAsync(surveyId));
+        }
+
+        [HttpGet("survey-students")]
+        public async ValueTask<IActionResult> GetSurveyStudentsAsync(Guid surveyId)
+        {
+            return Ok(await surveyService.GetSurveyStudentsAsync(surveyId));
         }
 
         [HttpGet("student-answers")]
@@ -50,8 +56,8 @@ namespace API.Controllers
         [HttpPost("send-survey")]
         public async ValueTask<IActionResult> SendSurveyAsync([FromBody] SurveySendingModel survey)
         {
-            await messageService.SendSurveyAsync(survey);
             await surveyService.ChangeSurveyStatusAsync(survey.Id, true);
+            await messageService.SendSurveyAsync(survey);
             if (survey.OpenPeriod is not null)
             {
                 await timerService.AddTimerAsync(survey.Id, survey.OpenPeriod.Value);

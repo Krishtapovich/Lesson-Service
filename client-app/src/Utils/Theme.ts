@@ -1,5 +1,7 @@
 import { createTheme } from "@mui/material";
 
+export const LOAD_TIME = 1500;
+
 export const colors = {
   drawer: "#111827",
   primary: "#10B981",

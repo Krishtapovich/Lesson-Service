@@ -29,7 +29,7 @@ export const card: SxProps = {
 };
 
 export const surveyPreview: SxProps = {
-  width: "60%",
+  width: "57%",
   border: "2px dashed white",
   borderRadius: 3,
   overflow: "auto",

@@ -10,7 +10,7 @@ namespace Domain.Models.Survey
         public Guid Id { get; set; }
         public string Title { get; set; }
         public bool IsClosed { get; set; }
-        public DateTime CreationTime { get; set; }
+        public DateTime CreationTime { get; set; } = DateTime.Now;
         public ICollection<QuestionModel> Questions { get; set; }
     }
 
@@ -19,7 +19,6 @@ namespace Domain.Models.Survey
         public Guid Id { get; set; }
         public string Title { get; set; }
         public bool IsClosed { get; set; } = true;
-        public DateTime CreationTime { get; set; }
         public ICollection<QuestionDto> Questions { get; set; }
     }
 
@@ -28,7 +27,6 @@ namespace Domain.Models.Survey
         public Guid Id { get; set; }
         public string Title { get; set; }
         public bool IsClosed { get; set; }
-        public DateTime CreationTime { get; set; }
     }
 
     public class SurveySendingModel

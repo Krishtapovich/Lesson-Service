@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Models.Group;
 using Domain.Models.Survey;
 
 namespace Domain.Repositories.SurveyRepository
 {
     public interface ISurveyRepository
     {
-        ValueTask<IEnumerable<SurveyModel>> GetSurveysAsync(int pageNumber, int pageSize);
+        ValueTask<IEnumerable<SurveyModel>> GetSurveysAsync();
         ValueTask<SurveyModel> AddSurveyAsync(SurveyModel survey);
         ValueTask DeleteSurveyAsync(Guid surveyId);
 
@@ -24,6 +25,8 @@ namespace Domain.Repositories.SurveyRepository
         ValueTask<IEnumerable<QuestionMessage>> GetSurveyOptionQuestionsAsync(Guid surveyId);
         ValueTask AddQuestionMessageAsync(int questionId, QuestionMessage message);
 
+        ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId);
+        ValueTask<IEnumerable<AnswerModel>> GetSurveyAnswersAsync(Guid surveyId);
         ValueTask<IEnumerable<AnswerModel>> GetStudentAnswersAsync(Guid surveyId, long studentId);
         ValueTask RegisterAnswerAsync(int messageId, string answerText = null, ImageModel image = null);
         ValueTask RegisterAnswerAsync(string pollId, string optionText);

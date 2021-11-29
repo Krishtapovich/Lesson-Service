@@ -11,7 +11,6 @@ namespace Domain.Models.Survey
         public string Text { get; set; }
         public Guid SurveyId { get; set; }
         public ICollection<OptionModel> Options { get; set; }
-        public ICollection<QuestionMessage> Messages { get; set; }
     }
 
     public class QuestionDto

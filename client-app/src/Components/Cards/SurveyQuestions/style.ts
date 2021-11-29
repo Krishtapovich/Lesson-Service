@@ -4,7 +4,8 @@ export const card: SxProps = {
   width: "60%",
   borderRadius: 3,
   background: "linear-gradient(90deg, rgba(29, 187, 221, 0.46), rgba(51, 241, 111, 0.69))",
-  boxShadow: 5
+  boxShadow: 5,
+  position: "relative"
 };
 
 export const header: SxProps = {
@@ -15,6 +16,12 @@ export const header: SxProps = {
   alignItems: "center",
   paddingX: 2,
   marginBottom: 2
+};
+
+export const loader: SxProps = {
+  position: "absolute",
+  top: "45%",
+  left: "45%"
 };
 
 export const content: SxProps = {
