@@ -26,7 +26,7 @@ namespace Domain
 
             builder.Entity<SurveyModel>().HasMany(s => s.Questions).WithOne().HasForeignKey(q => q.SurveyId).OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<QuestionModel>().HasOne<QuestionMessage>().WithOne(qm => qm.Question).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<QuestionModel>().HasMany<QuestionMessage>().WithOne(qm => qm.Question).OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<OptionModel>().HasOne(o => o.Question).WithMany(q => q.Options).HasForeignKey(o => o.QuestionId).OnDelete(DeleteBehavior.Cascade);
 

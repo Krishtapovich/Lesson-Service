@@ -45,6 +45,7 @@ export const content: SxProps = {
   "& > div": {
     height: "92%",
     overflowY: "auto",
+    padding: 3,
     "&::-webkit-scrollbar": {
       width: 8
     },

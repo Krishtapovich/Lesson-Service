@@ -38,7 +38,7 @@ interface Props {
 function SurveySendingModal(props: Props) {
   const { isOpen, handleClose, sendCallback } = props;
   const { groupStore } = useStore();
-  const { groupsNumbers, isLoading: isloading } = groupStore;
+  const { groupsNumbers, isLoading } = groupStore;
 
   useEffect(() => {
     groupStore.getGroupsNumbers();
@@ -87,7 +87,7 @@ function SurveySendingModal(props: Props) {
     <Modal open={isOpen} onClose={close}>
       <Box sx={modal}>
         <Typography sx={title}>Select groups</Typography>
-        <LoadingWrapper isLoading={isloading} sx={loader} size={"15%"}>
+        <LoadingWrapper isLoading={isLoading} sx={loader} size={"15%"}>
           <Box sx={tableWrapper}>
             <Table stickyHeader padding="checkbox">
               <TableHead>

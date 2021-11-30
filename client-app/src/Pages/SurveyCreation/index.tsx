@@ -11,7 +11,6 @@ import * as Yup from "yup";
 import {
   addOption,
   addQuestion,
-  creationPage,
   deleteIcon,
   option,
   optionsContainer,
@@ -59,7 +58,7 @@ function SurveyCreationPage() {
   };
 
   return (
-    <Box sx={creationPage}>
+    <Box>
       <Formik initialValues={initialSurvey} validationSchema={schema} onSubmit={handleSubmit}>
         {({ values, isValid, dirty }) => (
           <Form>

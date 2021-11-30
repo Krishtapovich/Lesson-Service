@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<AllSurveysPage />} />
         <Route path="/survey-creation" element={<SurveyCreationPage />} />
-        <Route path="/survey-results" element={<SurveyResultsPage />} />
+        <Route path="/survey-results/:surveyId" element={<SurveyResultsPage />} />
       </Routes>
     </Layout>
   );

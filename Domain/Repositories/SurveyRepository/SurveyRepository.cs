@@ -137,13 +137,12 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId)
         {
-            var r =  await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).Select(qm => qm.Student).Distinct().ToListAsync();
-            return r;
+            return  await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).Select(qm => qm.Student).Distinct().ToListAsync();
         }
 
         public async ValueTask<IEnumerable<AnswerModel>> GetSurveyAnswersAsync(Guid surveyId)
         {
-            return await context.Answers.Where(a => a.SurveyId == surveyId).ToListAsync();
+            return await context.Answers.Include(a => a.Option).Where(a => a.SurveyId == surveyId).ToListAsync();
         }
 
         public async ValueTask<IEnumerable<AnswerModel>> GetStudentAnswersAsync(Guid surveyId, long studentId)

@@ -1,9 +1,5 @@
 import { SxProps } from "@mui/system";
 
-export const creationPage: SxProps = {
-  padding: 2
-};
-
 export const title: SxProps = {
   width: "35%"
 };

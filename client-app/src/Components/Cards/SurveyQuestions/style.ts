@@ -37,6 +37,9 @@ export const content: SxProps = {
     backgroundColor: "#39aebd",
     backgroundClip: "padding-box",
     borderRadius: 3
+  },
+  "&::-webkit-scrollbar-track": {
+    marginY: 1
   }
 };
 

@@ -13,7 +13,7 @@ namespace Domain.Models.Survey
         public long? StudentId { get; set; }
         public StudentModel Student { get; set; }
 
-        public int QuestionId { get; set; }
+        public int? QuestionId { get; set; }
         public QuestionModel Question { get; set; }
     }
 }

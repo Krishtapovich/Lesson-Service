@@ -11,6 +11,7 @@ namespace API.Services.SurveyService
         ValueTask<IEnumerable<SurveyListModel>> GetSurveysAsync();
         ValueTask<IEnumerable<QuestionDto>> GetSurveyQuestionsAsync(Guid surveyId);
         ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId);
+        ValueTask<IEnumerable<AnswerDto>> GetSurveyAnswersAsync(Guid surveyId);
         ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId);
         ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto);
         ValueTask DeleteSurveyAsync(Guid surveyId);

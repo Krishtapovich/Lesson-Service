@@ -11,7 +11,7 @@ import { card, pageWrapper, previewText, surveyBlock, surveyPreview } from "./st
 
 function AllSurveysPage() {
   const { surveyStore } = useStore();
-  const { surveys, isSurveysLoading } = surveyStore;
+  const { surveys, isLoading } = surveyStore;
 
   const [surveyId, setSurveyId] = useState<string>();
 
@@ -21,13 +21,7 @@ function AllSurveysPage() {
   }, [surveyStore]);
 
   const navigate = useNavigate();
-  const resultsCallback = (surveyId: string) => {
-    navigate("/survey-results", {
-      state: {
-        surveyId
-      }
-    });
-  };
+  const resultsCallback = (surveyId: string) => navigate(`/survey-results/${surveyId}`);
 
   const deleteCallback = (surveyId: string) => {
     surveyStore.deleteSurvey(surveyId);
@@ -36,7 +30,7 @@ function AllSurveysPage() {
 
   return (
     <Box sx={pageWrapper}>
-      <LoadingWrapper isLoading={isSurveysLoading} size={"10%"}>
+      <LoadingWrapper isLoading={isLoading} size={"10%"}>
         <Box sx={surveyBlock}>
           {surveys.map((s) => (
             <SurveyCard

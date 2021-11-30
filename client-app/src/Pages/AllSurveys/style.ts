@@ -1,7 +1,6 @@
 import { SxProps } from "@mui/system";
 
 export const pageWrapper: SxProps = {
-  padding: 3,
   margin: "auto",
   display: "flex",
   flexDirection: "row",

@@ -18,6 +18,10 @@ class SurveyService extends BaseService {
     return this.requests.get<Array<StudentModel>>("survey/survey-students", { surveyId });
   }
 
+  getSurveyAnswers(surveyId: string) {
+    return this.requests.get<Array<AnswerModel>>("survey/survey-answers", { surveyId });
+  }
+
   getStudentAnswers(surveyId: string, studentId: number) {
     return this.requests.get<Array<AnswerModel>>("survey/student-answers", {
       surveyId,

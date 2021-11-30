@@ -11,12 +11,13 @@ export default class SurveyStore {
   surveys: Array<SurveyListModel> = [];
   surveyQuestions: Array<QuestionModel> = [];
   surveyStudents: Array<StudentModel> = [];
-  studentAnswers: Array<AnswerModel> = [];
-
+  answers: Array<AnswerModel> = [];
   currentSurvey?: SurveyListModel;
 
-  isSurveysLoading = false;
+  isLoading = false;
   isQuestionsLoading = false;
+  isAllAnswersLoading = false;
+  isStudentAnswersLoading = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -24,18 +25,18 @@ export default class SurveyStore {
 
   dispose() {
     this.surveyQuestions = [];
-    this.studentAnswers = [];
+    this.answers = [];
     this.surveyStudents = [];
   }
 
   getSurveys() {
     if (!this.surveys.length) {
-      this.isSurveysLoading = true;
+      this.isLoading = true;
       setTimeout(async () => {
         const surveys = await surveyService.getSurveys();
         runInAction(() => {
           this.surveys = surveys;
-          this.isSurveysLoading = false;
+          this.isLoading = false;
         });
       }, LOAD_TIME);
     }
@@ -56,14 +57,37 @@ export default class SurveyStore {
     }, LOAD_TIME);
   }
 
-  async getSurveyStudents(surveyId: string) {
-    const students = await surveyService.getSurveyStudents(surveyId);
-    runInAction(() => (this.surveyStudents = students));
+  getSurveyStudents(surveyId: string) {
+    this.isLoading = true;
+    setTimeout(async () => {
+      const students = await surveyService.getSurveyStudents(surveyId);
+      runInAction(() => {
+        this.surveyStudents = students;
+        this.isLoading = false;
+      });
+    }, LOAD_TIME);
   }
 
-  async getStudentAnswers(surveyId: string, studentId: number) {
-    const answers = await surveyService.getStudentAnswers(surveyId, studentId);
-    runInAction(() => (this.studentAnswers = answers));
+  getSurveyAnswers(surveyId: string) {
+    this.isAllAnswersLoading = true;
+    setTimeout(async () => {
+      const answers = await surveyService.getSurveyAnswers(surveyId);
+      runInAction(() => {
+        this.answers = answers;
+        this.isAllAnswersLoading = false;
+      });
+    }, LOAD_TIME);
+  }
+
+  getStudentAnswers(surveyId: string, studentId: number) {
+    this.isStudentAnswersLoading = true;
+    setTimeout(async () => {
+      const answers = await surveyService.getStudentAnswers(surveyId, studentId);
+      runInAction(() => {
+        this.answers = answers;
+        this.isStudentAnswersLoading = false;
+      });
+    }, LOAD_TIME);
   }
 
   async addSurvey(formSurvey: SurveyFormModel) {

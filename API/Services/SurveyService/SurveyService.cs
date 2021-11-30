@@ -39,6 +39,12 @@ namespace API.Services.SurveyService
             return await surveyRepository.GetSurveyStudentsAsync(surveyId);
         }
 
+        public async ValueTask<IEnumerable<AnswerDto>> GetSurveyAnswersAsync(Guid surveyId)
+        {
+            var answers = await surveyRepository.GetSurveyAnswersAsync(surveyId);
+            return mapper.Map<IEnumerable<AnswerDto>>(answers);
+        }
+
         public async ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
             var answers = await surveyRepository.GetStudentAnswersAsync(surveyId, studentId);
