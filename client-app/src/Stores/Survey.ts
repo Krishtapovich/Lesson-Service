@@ -2,6 +2,7 @@ import AnswerModel from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
 import StudentModel from "@Models/Student";
 import { SurveyCreateModel, SurveyFormModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
+import { AnswerVisualizationModel } from "@Models/Visualization";
 import surveyService from "@Services/Survey";
 import { LOAD_TIME } from "@Utils/Theme";
 import { makeAutoObservable, runInAction } from "mobx";
@@ -13,6 +14,7 @@ export default class SurveyStore {
   surveyStudents: Array<StudentModel> = [];
   answers: Array<AnswerModel> = [];
   currentSurvey?: SurveyListModel;
+  visualization: Array<AnswerVisualizationModel> = [];
 
   isLoading = false;
   isQuestionsLoading = false;
@@ -23,10 +25,15 @@ export default class SurveyStore {
     makeAutoObservable(this);
   }
 
-  dispose() {
+  disposePreview() {
     this.surveyQuestions = [];
+  }
+
+  disposeResults() {
     this.answers = [];
     this.surveyStudents = [];
+    this.surveyQuestions = [];
+    this.visualization = [];
   }
 
   getSurveys() {
@@ -72,8 +79,10 @@ export default class SurveyStore {
     this.isAllAnswersLoading = true;
     setTimeout(async () => {
       const answers = await surveyService.getSurveyAnswers(surveyId);
+      const visualization = await surveyService.getSurveyAnswersVisualization(surveyId);
       runInAction(() => {
         this.answers = answers;
+        this.visualization = visualization;
         this.isAllAnswersLoading = false;
       });
     }, LOAD_TIME);

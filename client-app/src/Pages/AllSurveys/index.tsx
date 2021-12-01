@@ -17,7 +17,7 @@ function AllSurveysPage() {
 
   useEffect(() => {
     surveyStore.getSurveys();
-    return () => surveyStore.dispose();
+    return () => surveyStore.disposePreview();
   }, [surveyStore]);
 
   const navigate = useNavigate();

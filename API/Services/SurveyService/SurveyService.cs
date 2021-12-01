@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.CloudStorage;
 using AutoMapper;
+using System.Linq;
 using Domain.Models.Group;
 using Domain.Models.Survey;
 using Domain.Repositories.SurveyRepository;
+using Domain.Models.Results;
 
 namespace API.Services.SurveyService
 {
@@ -43,6 +45,23 @@ namespace API.Services.SurveyService
         {
             var answers = await surveyRepository.GetSurveyAnswersAsync(surveyId);
             return mapper.Map<IEnumerable<AnswerDto>>(answers);
+        }
+
+        public async ValueTask<IEnumerable<AnswerVisualizationModel>> GetSurveyAnswersVisualizationAsync(Guid surveyId)
+        {
+            var answers = await surveyRepository.GetSurveyAnswersAsync(surveyId);
+            var questions = await surveyRepository.GetSurveyQuestionsAsync(surveyId);
+            var visualization = questions.Where(q => q.Options.Count != 0).Select(q => new AnswerVisualizationModel
+            {
+                QuestionText = q.Text,
+                Options = q.Options.Select(o => new OptionVisualizationModel
+                {
+                    OptionText = o.Text,
+                    AnswersAmount = answers.Count(a => a.Option?.Text == o.Text),
+                    IsCorrect = o.IsCorrect
+                })
+            });
+            return visualization;
         }
 
         public async ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId)

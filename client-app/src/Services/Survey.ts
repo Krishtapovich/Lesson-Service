@@ -2,6 +2,7 @@ import AnswerModel from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
 import StudentModel from "@Models/Student";
 import { SurveyCreateModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
+import { AnswerVisualizationModel } from "@Models/Visualization";
 
 import BaseService from "./Base";
 
@@ -20,6 +21,12 @@ class SurveyService extends BaseService {
 
   getSurveyAnswers(surveyId: string) {
     return this.requests.get<Array<AnswerModel>>("survey/survey-answers", { surveyId });
+  }
+
+  getSurveyAnswersVisualization(surveyId: string) {
+    return this.requests.get<Array<AnswerVisualizationModel>>("survey/survey-visualization", {
+      surveyId
+    });
   }
 
   getStudentAnswers(surveyId: string, studentId: number) {

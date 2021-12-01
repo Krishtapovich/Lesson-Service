@@ -17,7 +17,7 @@ function SurveyResultsPage() {
   useEffect(() => {
     surveyStore.getSurveyStudents(surveyId!);
     surveyStore.getSurveyAnswers(surveyId!);
-    return () => surveyStore.dispose();
+    return () => surveyStore.disposeResults();
   }, [surveyStore, surveyId]);
 
   return (

@@ -10,7 +10,7 @@ import {
   TableHead,
   TableRow,
   TextFieldProps,
-  Typography
+  Typography,
 } from "@mui/material";
 import useStore from "@Stores";
 import { observer } from "mobx-react-lite";
@@ -19,6 +19,7 @@ import NumberFormat from "react-number-format";
 
 import {
   checkbox,
+  loader,
   modal,
   sendButton,
   tableBodyCell,
@@ -26,7 +27,6 @@ import {
   tableWrapper,
   TextInput,
   title,
-  loader
 } from "./style";
 
 interface Props {

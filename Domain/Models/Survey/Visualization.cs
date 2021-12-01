@@ -6,11 +6,11 @@ namespace Domain.Models.Results
     {
         public string OptionText { get; set; }
         public int AnswersAmount { get; set; }
+        public bool IsCorrect { get; set; }
     }
 
-    public class QuestionVisualizationModel
+    public class AnswerVisualizationModel
     {
-        public int Id { get; set; }
         public string QuestionText { get; set; }
         public IEnumerable<OptionVisualizationModel> Options { get; set; }
     }

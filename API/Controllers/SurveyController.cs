@@ -47,6 +47,12 @@ namespace API.Controllers
             return Ok(await surveyService.GetSurveyAnswersAsync(surveyId));
         }
 
+        [HttpGet("survey-visualization")]
+        public async ValueTask<IActionResult> GetSurveyAnswersVisualizationAsync(Guid surveyId)
+        {
+            return Ok(await surveyService.GetSurveyAnswersVisualizationAsync(surveyId));
+        }
+
         [HttpGet("student-answers")]
         public async ValueTask<IActionResult> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {

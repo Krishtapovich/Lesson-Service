@@ -20,10 +20,9 @@ namespace Domain.Models.Survey
 
     public class AnswerDto
     {
-        public int Id { get; set; }
         public string Text { get; set; }
         public string ImageUrl { get; set; }
         public OptionDto Option { get; set; }
-        public QuestionDto Question { get; set; }
+        public string QuestionText { get; set; }
     }
 }
