@@ -1,7 +1,7 @@
 export interface OptionVisualizationModel {
   optionText: string;
   answersAmount: number;
-  iscorrect: boolean;
+  isCorrect: boolean;
 }
 
 export interface AnswerVisualizationModel {

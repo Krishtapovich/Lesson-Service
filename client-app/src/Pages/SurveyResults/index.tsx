@@ -1,3 +1,4 @@
+import ResultVisualizationCard from "@Components/Cards/ResultVisualization";
 import LoadingWrapper from "@Components/LoadingWrapper";
 import StudentsTable from "@Components/StudentsTable";
 import { Box } from "@mui/material";
@@ -6,14 +7,14 @@ import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { loader, tableWrapper } from "./style";
+import { content, loader, tableWrapper, charts } from "./style";
 
 function SurveyResultsPage() {
   const { surveyStore } = useStore();
   const { surveyId } = useParams();
 
-  const { surveyStudents, isAllAnswersLoading } = surveyStore;
-
+  const { surveyStudents, visualization, isAllAnswersLoading } = surveyStore;
+console.log(JSON.stringify(visualization, null, 2))
   useEffect(() => {
     surveyStore.getSurveyStudents(surveyId!);
     surveyStore.getSurveyAnswers(surveyId!);
@@ -21,16 +22,17 @@ function SurveyResultsPage() {
   }, [surveyStore, surveyId]);
 
   return (
-    <Box>
-      <LoadingWrapper size="10%" sx={loader} isLoading={isAllAnswersLoading}>
+    <LoadingWrapper size="10%" sx={loader} isLoading={isAllAnswersLoading}>
+      <Box sx={content}>
         <Box sx={tableWrapper}>
           <StudentsTable
             students={surveyStudents}
             resultsCallback={(studentId) => surveyStore.getStudentAnswers(surveyId!, studentId)}
           />
         </Box>
-      </LoadingWrapper>
-    </Box>
+        <ResultVisualizationCard answers={visualization} sx={charts} />
+      </Box>
+    </LoadingWrapper>
   );
 }
 
