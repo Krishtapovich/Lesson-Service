@@ -25,12 +25,9 @@ export const optionsContainer: SxProps = {
   maxHeight: 220,
   overflowY: "auto",
   marginY: 2,
-  "&::-webkit-scrollbar": {
-    width: 4
-  },
+
   "&::-webkit-scrollbar-thumb": {
     backgroundColor: "#1c7483",
-    borderRadius: 3
   }
 };
 

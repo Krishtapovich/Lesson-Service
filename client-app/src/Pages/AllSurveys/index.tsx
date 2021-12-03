@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { card, pageWrapper, previewText, surveyBlock, surveyPreview } from "./style";
+import { card, pageWrapper, previewText, rightBlock, surveyBlock, surveyPreview } from "./style";
 
 function AllSurveysPage() {
   const { surveyStore } = useStore();
@@ -46,7 +46,7 @@ function AllSurveysPage() {
         </Box>
       </LoadingWrapper>
       {surveyId ? (
-        <SurveyQuestionsCard surveyId={surveyId} />
+        <SurveyQuestionsCard surveyId={surveyId} sx={rightBlock} />
       ) : (
         <Box sx={surveyPreview}>
           <Typography sx={previewText}>Click Details to see survey</Typography>

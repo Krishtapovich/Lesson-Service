@@ -6,13 +6,15 @@ export const loader: SxProps = {
 
 export const content: SxProps = {
   display: "flex",
-  flexDirection: "row"
+  flexDirection: "row",
+  justifyContent: "space-between"
 };
 
 export const tableWrapper: SxProps = {
   width: "fit-content",
   height: "fit-content",
   maxHeight: "100%",
+  flexGrow: 1,
   overflowY: "auto",
   marginRight: 7,
   borderRadius: 3,
@@ -22,6 +24,5 @@ export const tableWrapper: SxProps = {
 };
 
 export const charts: SxProps = {
-  overflowY: "auto",
-  maxHeight: "100%"
+  maxWidth: "50%"
 };

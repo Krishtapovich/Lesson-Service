@@ -1,33 +1,11 @@
 import LoadingWrapper from "@Components/LoadingWrapper";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Modal,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextFieldProps,
-  Typography,
-} from "@mui/material";
+import * as MUI from "@mui/material";
 import useStore from "@Stores";
 import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
 import NumberFormat from "react-number-format";
 
-import {
-  checkbox,
-  loader,
-  modal,
-  sendButton,
-  tableBodyCell,
-  tableHeaderCell,
-  tableWrapper,
-  TextInput,
-  title,
-} from "./style";
+import * as style from "./style";
 
 interface Props {
   isOpen: boolean;
@@ -84,40 +62,40 @@ function SurveySendingModal(props: Props) {
   };
 
   return (
-    <Modal open={isOpen} onClose={close}>
-      <Box sx={modal}>
-        <Typography sx={title}>Select groups</Typography>
-        <LoadingWrapper isLoading={isLoading} sx={loader} size={"15%"}>
-          <Box sx={tableWrapper}>
-            <Table stickyHeader padding="checkbox">
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={tableHeaderCell}>
-                    <Checkbox sx={checkbox} onChange={handleAllSelected} />
-                  </TableCell>
-                  <TableCell sx={tableHeaderCell}>
-                    <Typography align="center">Number</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+    <MUI.Modal open={isOpen} onClose={close}>
+      <MUI.Box sx={style.modal}>
+        <MUI.Typography sx={style.title}>Select groups</MUI.Typography>
+        <LoadingWrapper isLoading={isLoading} sx={style.loader} size={"15%"}>
+          <MUI.Box sx={style.tableWrapper}>
+            <MUI.Table stickyHeader padding="checkbox">
+              <MUI.TableHead>
+                <MUI.TableRow>
+                  <MUI.TableCell sx={style.tableHeaderCell}>
+                    <MUI.Checkbox sx={style.checkbox} onChange={handleAllSelected} />
+                  </MUI.TableCell>
+                  <MUI.TableCell sx={style.tableHeaderCell}>
+                    <MUI.Typography align="center">Number</MUI.Typography>
+                  </MUI.TableCell>
+                </MUI.TableRow>
+              </MUI.TableHead>
+              <MUI.TableBody>
                 {groupsNumbers.map((group) => (
-                  <TableRow selected={checkSelection(group)} key={group}>
-                    <TableCell sx={tableBodyCell}>
-                      <Checkbox
-                        sx={checkbox}
+                  <MUI.TableRow selected={checkSelection(group)} key={group}>
+                    <MUI.TableCell sx={style.tableBodyCell}>
+                      <MUI.Checkbox
+                        sx={style.checkbox}
                         checked={checkSelection(group)}
                         onChange={(e) => handleRowSelected(e, group)}
                       />
-                    </TableCell>
-                    <TableCell align="center" sx={tableBodyCell}>
+                    </MUI.TableCell>
+                    <MUI.TableCell align="center" sx={style.tableBodyCell}>
                       {group}
-                    </TableCell>
-                  </TableRow>
+                    </MUI.TableCell>
+                  </MUI.TableRow>
                 ))}
-              </TableBody>
-            </Table>
-          </Box>
+              </MUI.TableBody>
+            </MUI.Table>
+          </MUI.Box>
         </LoadingWrapper>
         <NumberFormat
           customInput={PeriodInput}
@@ -125,16 +103,16 @@ function SurveySendingModal(props: Props) {
           placeholder="hh:mm:ss"
           onChange={(e) => setTime(e.target.value)}
         />
-        <Button sx={sendButton} onClick={handleSend} variant="outlined">
+        <MUI.Button sx={style.sendButton} onClick={handleSend} variant="outlined">
           Send
-        </Button>
-      </Box>
-    </Modal>
+        </MUI.Button>
+      </MUI.Box>
+    </MUI.Modal>
   );
 }
 
 export default observer(SurveySendingModal);
 
-const PeriodInput: React.FC<TextFieldProps> = (props: TextFieldProps) => (
-  <TextInput {...props} label="OpenPeriod" />
+const PeriodInput: React.FC<MUI.TextFieldProps> = (props: MUI.TextFieldProps) => (
+  <style.TextInput {...props} label="OpenPeriod" />
 );

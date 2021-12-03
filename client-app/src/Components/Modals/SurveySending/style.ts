@@ -33,12 +33,9 @@ export const tableWrapper: SxProps = {
   maxHeight: 250,
   borderRadius: 3,
   overflowY: "auto",
-  "&::-webkit-scrollbar": {
-    width: 4
-  },
+
   "&::-webkit-scrollbar-thumb": {
     backgroundColor: "#39aebd",
-    borderRadius: 3
   }
 };
 

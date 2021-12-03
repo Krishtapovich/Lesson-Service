@@ -14,7 +14,7 @@ function SurveyResultsPage() {
   const { surveyId } = useParams();
 
   const { surveyStudents, visualization, isAllAnswersLoading } = surveyStore;
-console.log(JSON.stringify(visualization, null, 2))
+
   useEffect(() => {
     surveyStore.getSurveyStudents(surveyId!);
     surveyStore.getSurveyAnswers(surveyId!);

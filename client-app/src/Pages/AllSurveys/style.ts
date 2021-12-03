@@ -12,12 +12,9 @@ export const surveyBlock: SxProps = {
   marginRight: 3,
   paddingY: 1.2,
   overflow: "auto",
-  "&::-webkit-scrollbar": {
-    width: 4
-  },
+
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#10B981",
-    borderRadius: 3
+    backgroundColor: "#10B981"
   }
 };
 
@@ -27,8 +24,12 @@ export const card: SxProps = {
   background: "linear-gradient(90deg, rgba(38,99,142,1) 0%, rgba(57,177,191,1) 100%)"
 };
 
+export const rightBlock: SxProps = {
+  width: "57%"
+};
+
 export const surveyPreview: SxProps = {
-  width: "57%",
+  ...rightBlock,
   border: "2px dashed white",
   borderRadius: 3,
   overflow: "auto",

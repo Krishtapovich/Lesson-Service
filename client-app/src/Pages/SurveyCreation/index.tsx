@@ -8,18 +8,7 @@ import { FieldArray, Form, Formik, FormikHelpers } from "formik";
 import { observer } from "mobx-react-lite";
 import * as Yup from "yup";
 
-import {
-  addOption,
-  addQuestion,
-  deleteIcon,
-  option,
-  optionsContainer,
-  optionWrapper,
-  question,
-  questionWrapper,
-  save,
-  title,
-} from "./style";
+import * as style from "./style";
 
 function SurveyCreationPage() {
   const { surveyStore } = useStore();
@@ -53,7 +42,7 @@ function SurveyCreationPage() {
   });
 
   const handleSubmit = (survey: SurveyFormModel, formikHelpers: FormikHelpers<SurveyFormModel>) => {
-    surveyStore.addSurvey({ ...survey });
+    surveyStore.addSurvey(survey);
     formikHelpers.resetForm();
   };
 
@@ -62,29 +51,29 @@ function SurveyCreationPage() {
       <Formik initialValues={initialSurvey} validationSchema={schema} onSubmit={handleSubmit}>
         {({ values, isValid, dirty }) => (
           <Form>
-            <TextField name="title" label="Title" sx={title} />
+            <TextField name="title" label="Title" sx={style.title} />
             <FieldArray
               name="questions"
               render={(questions) => (
                 <Box>
                   {values.questions.map((_, i) => (
                     <Box key={i}>
-                      <Box sx={questionWrapper}>
+                      <Box sx={style.questionWrapper}>
                         <TextField
                           name={`questions[${i}].text`}
                           multiline
                           label="Question"
-                          sx={question}
+                          sx={style.question}
                         />
-                        <DeleteIcon sx={deleteIcon} onClick={() => questions.remove(i)} />
+                        <DeleteIcon sx={style.deleteIcon} onClick={() => questions.remove(i)} />
                       </Box>
                       <FieldArray
                         name={`questions[${i}].options`}
                         render={(options) => (
                           <>
-                            <Box sx={optionsContainer}>
+                            <Box sx={style.optionsContainer}>
                               {values.questions[i].options?.map((_, j) => (
-                                <Box key={j} sx={optionWrapper}>
+                                <Box key={j} sx={style.optionWrapper}>
                                   <Checkbox
                                     name={`questions[${i}].options[${j}].isCorrect`}
                                     label="Is Correct"
@@ -93,15 +82,18 @@ function SurveyCreationPage() {
                                     name={`questions[${i}].options[${j}].text`}
                                     label="Option"
                                     multiline
-                                    sx={option}
+                                    sx={style.option}
                                   />
-                                  <DeleteIcon sx={deleteIcon} onClick={() => options.remove(j)} />
+                                  <DeleteIcon
+                                    sx={style.deleteIcon}
+                                    onClick={() => options.remove(j)}
+                                  />
                                 </Box>
                               ))}
                             </Box>
                             <Button
                               variant="contained"
-                              sx={addOption}
+                              sx={style.addOption}
                               onClick={() => options.push({})}
                             >
                               Add Option
@@ -111,13 +103,17 @@ function SurveyCreationPage() {
                       />
                     </Box>
                   ))}
-                  <Button variant="contained" sx={addQuestion} onClick={() => questions.push({})}>
+                  <Button
+                    variant="contained"
+                    sx={style.addQuestion}
+                    onClick={() => questions.push({})}
+                  >
                     Add Question
                   </Button>
                 </Box>
               )}
             />
-            <Button sx={save} type="submit" variant="contained" disabled={!isValid || !dirty}>
+            <Button sx={style.save} type="submit" variant="contained" disabled={!isValid || !dirty}>
               Save
             </Button>
           </Form>

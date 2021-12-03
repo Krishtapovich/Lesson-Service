@@ -1,7 +1,6 @@
 import { SxProps } from "@mui/system";
 
 export const card: SxProps = {
-  width: "60%",
   borderRadius: 3,
   background: "linear-gradient(90deg, rgba(29, 187, 221, 0.46), rgba(51, 241, 111, 0.69))",
   boxShadow: 5,
@@ -29,17 +28,8 @@ export const content: SxProps = {
   paddingX: 2,
   overflow: "auto",
 
-  "&::-webkit-scrollbar": {
-    width: 4,
-    marginRight: 1
-  },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#39aebd",
-    backgroundClip: "padding-box",
-    borderRadius: 3
-  },
-  "&::-webkit-scrollbar-track": {
-    marginY: 1
+    backgroundColor: "#39aebd"
   }
 };
 

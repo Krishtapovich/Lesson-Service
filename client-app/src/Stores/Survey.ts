@@ -1,7 +1,7 @@
 import AnswerModel from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
 import StudentModel from "@Models/Student";
-import { SurveyCreateModel, SurveyFormModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
+import * as Survey from "@Models/Survey";
 import { AnswerVisualizationModel } from "@Models/Visualization";
 import surveyService from "@Services/Survey";
 import { LOAD_TIME } from "@Utils/Theme";
@@ -9,11 +9,11 @@ import { makeAutoObservable, runInAction } from "mobx";
 import uuid from "uuid";
 
 export default class SurveyStore {
-  surveys: Array<SurveyListModel> = [];
+  surveys: Array<Survey.SurveyListModel> = [];
   surveyQuestions: Array<QuestionModel> = [];
   surveyStudents: Array<StudentModel> = [];
   answers: Array<AnswerModel> = [];
-  currentSurvey?: SurveyListModel;
+  currentSurvey?: Survey.SurveyListModel;
   visualization: Array<AnswerVisualizationModel> = [];
 
   isLoading = false;
@@ -99,8 +99,8 @@ export default class SurveyStore {
     }, LOAD_TIME);
   }
 
-  async addSurvey(formSurvey: SurveyFormModel) {
-    const survey: SurveyCreateModel = {
+  async addSurvey(formSurvey: Survey.SurveyFormModel) {
+    const survey: Survey.SurveyCreateModel = {
       id: uuid.v4().toString(),
       ...formSurvey
     };
@@ -108,7 +108,7 @@ export default class SurveyStore {
     runInAction(() => (this.surveys = [newSurvey, ...this.surveys]));
   }
 
-  sendSurvey(survey: SurveySendingModel) {
+  sendSurvey(survey: Survey.SurveySendingModel) {
     this.surveys = this.surveys.map((s) => (s.id === survey.id ? { ...s, isClosed: false } : s));
     this.currentSurvey!.isClosed = false;
     surveyService.sendSurveyToGroups(survey);
