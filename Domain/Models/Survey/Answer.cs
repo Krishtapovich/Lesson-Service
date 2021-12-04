@@ -22,7 +22,7 @@ namespace Domain.Models.Survey
     {
         public string Text { get; set; }
         public string ImageUrl { get; set; }
-        public OptionDto Option { get; set; }
-        public string QuestionText { get; set; }
+        public int? OptionId { get; set; }
+        public QuestionDto Question { get; set; }
     }
 }

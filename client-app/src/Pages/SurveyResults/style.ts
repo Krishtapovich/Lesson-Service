@@ -23,6 +23,6 @@ export const tableWrapper: SxProps = {
   }
 };
 
-export const charts: SxProps = {
-  maxWidth: "50%"
+export const card: SxProps = {
+  width: "50%"
 };

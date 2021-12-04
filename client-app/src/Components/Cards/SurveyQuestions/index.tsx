@@ -53,7 +53,7 @@ function SurveyQuestionsCard({ surveyId, sx }: Props) {
         <LoadingWrapper isLoading={isQuestionsLoading} sx={loader} size="15%">
           <Box sx={content}>
             {surveyQuestions.map((q, i) => (
-              <Box key={q.id}>
+              <Box key={i}>
                 <Typography sx={question}>{`${i + 1}. ${q.text}`}</Typography>
                 {q.options?.map((o) => (
                   <Box sx={option(o.isCorrect)} key={o.id}>

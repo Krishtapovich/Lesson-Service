@@ -1,5 +1,5 @@
 import { AnswerVisualizationModel } from "@Models/Visualization";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Card } from "@mui/material";
 import { SxProps } from "@mui/system";
 import * as Chart from "recharts";
 
@@ -14,10 +14,10 @@ function ResultVisualizationCard({ answers, sx }: Props) {
   const style = { ...card, ...sx };
 
   return (
-    <Box sx={style}>
+    <Card sx={style}>
       <Box sx={contentWrapper}>
-        {answers.map((a) => (
-          <Box>
+        {answers.map((a, i) => (
+          <Box key={i}>
             <Typography sx={text}>{a.questionText}</Typography>
             <Box sx={chartWrapper}>
               <Chart.ResponsiveContainer minWidth={"100%"} aspect={2.5}>
@@ -51,7 +51,7 @@ function ResultVisualizationCard({ answers, sx }: Props) {
           </Box>
         ))}
       </Box>
-    </Box>
+    </Card>
   );
 }
 

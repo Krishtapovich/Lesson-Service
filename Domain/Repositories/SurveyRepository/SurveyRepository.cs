@@ -151,7 +151,10 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask<IEnumerable<AnswerModel>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
-            return await context.Answers.Where(a => a.SurveyId == surveyId && a.QuestionMessage.StudentId == studentId)
+            return await context.Answers.Include(a => a.QuestionMessage)
+                                        .ThenInclude(qm => qm.Question)
+                                        .ThenInclude(q => q.Options)
+                                        .Where(a => a.SurveyId == surveyId && a.QuestionMessage.StudentId == studentId)
                                         .Include(a => a.Option)
                                         .Include(a => a.Image)
                                         .OrderBy(a => a.QuestionMessage.Id)

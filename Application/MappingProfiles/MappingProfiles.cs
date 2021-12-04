@@ -18,7 +18,7 @@ namespace Application.MappingProfiles
 
             CreateMap<AnswerModel, AnswerDto>()
                 .ForMember(a => a.ImageUrl, o => o.MapFrom(a => a.Image.Url))
-                .ForMember(a => a.QuestionText, o => o.MapFrom(a => a.QuestionMessage.Question.Text));
+                .ForMember(a => a.Question, o => o.MapFrom(a => a.QuestionMessage.Question));
         }
     }
 }

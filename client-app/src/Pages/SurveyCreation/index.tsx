@@ -1,11 +1,13 @@
 import Checkbox from "@Components/Formik/Checkbox";
 import TextField from "@Components/Formik/TextField";
+import { QuestionCreateModel } from "@Models/Question";
 import { SurveyFormModel } from "@Models/Survey";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import useStore from "@Stores";
-import { FieldArray, Form, Formik, FormikHelpers } from "formik";
+import { FieldArray, Form, Formik, FormikErrors, FormikHelpers } from "formik";
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 import * as Yup from "yup";
 
 import * as style from "./style";
@@ -35,26 +37,61 @@ function SurveyCreationPage() {
                 isCorrect: Yup.boolean().notRequired()
               })
             )
-            .test("", "", (value: any) => !value || !value.length || value.length > 1)
+            .test(
+              "test-amount",
+              "Questions with options should have at least 2 options",
+              async (value: any) => !value || !value.length || value.length > 1
+            )
+            .test(
+              "test-isCorrect",
+              "One option should be marked as correct",
+              async (value: any) =>
+                !value || !value.length || value.filter((o: any) => o.isCorrect).length === 1
+            )
         })
       )
-      .min(1)
+      .min(1, "Survey should have at least one question")
   });
 
-  const handleSubmit = (survey: SurveyFormModel, formikHelpers: FormikHelpers<SurveyFormModel>) => {
+  const handleSubmit = async (survey: SurveyFormModel, helpers: FormikHelpers<SurveyFormModel>) => {
     surveyStore.addSurvey(survey);
-    formikHelpers.resetForm();
+    helpers.resetForm();
+  };
+
+  const [errors, setErrors] = useState<FormikErrors<SurveyFormModel>>();
+
+  const showQuestionsErrors = () => {
+    const questions = errors?.questions;
+    return (
+      typeof questions === "string" && <Typography sx={style.errorText}>{questions}</Typography>
+    );
+  };
+
+  const showOptionsErrors = (i: number) => {
+    const questions = errors?.questions as Array<FormikErrors<QuestionCreateModel>>;
+    if (questions) {
+      const optionErrors = questions[i]?.options;
+      return (
+        typeof optionErrors === "string" && (
+          <Typography sx={style.errorText}>{optionErrors}</Typography>
+        )
+      );
+    }
   };
 
   return (
     <Box>
-      <Formik initialValues={initialSurvey} validationSchema={schema} onSubmit={handleSubmit}>
-        {({ values, isValid, dirty }) => (
-          <Form>
+      <Formik
+        initialValues={initialSurvey}
+        validationSchema={schema}
+        validateOnChange={false}
+        onSubmit={handleSubmit}
+      >
+        {({ values, validateForm }) => (
+          <Form noValidate>
             <TextField name="title" label="Title" sx={style.title} />
-            <FieldArray
-              name="questions"
-              render={(questions) => (
+            <FieldArray name="questions">
+              {({ push, remove }) => (
                 <Box>
                   {values.questions.map((_, i) => (
                     <Box key={i}>
@@ -65,11 +102,10 @@ function SurveyCreationPage() {
                           label="Question"
                           sx={style.question}
                         />
-                        <DeleteIcon sx={style.deleteIcon} onClick={() => questions.remove(i)} />
+                        <DeleteIcon sx={style.deleteIcon} onClick={() => remove(i)} />
                       </Box>
-                      <FieldArray
-                        name={`questions[${i}].options`}
-                        render={(options) => (
+                      <FieldArray name={`questions[${i}].options`}>
+                        {({ push, remove }) => (
                           <>
                             <Box sx={style.optionsContainer}>
                               {values.questions[i].options?.map((_, j) => (
@@ -84,36 +120,40 @@ function SurveyCreationPage() {
                                     multiline
                                     sx={style.option}
                                   />
-                                  <DeleteIcon
-                                    sx={style.deleteIcon}
-                                    onClick={() => options.remove(j)}
-                                  />
+                                  <DeleteIcon sx={style.deleteIcon} onClick={() => remove(j)} />
                                 </Box>
                               ))}
                             </Box>
+                            {showOptionsErrors(i)}
                             <Button
                               variant="contained"
                               sx={style.addOption}
-                              onClick={() => options.push({})}
+                              onClick={() => push({ text: "" })}
                             >
                               Add Option
                             </Button>
                           </>
                         )}
-                      />
+                      </FieldArray>
                     </Box>
                   ))}
                   <Button
                     variant="contained"
                     sx={style.addQuestion}
-                    onClick={() => questions.push({})}
+                    onClick={() => push({ text: "" })}
                   >
                     Add Question
                   </Button>
                 </Box>
               )}
-            />
-            <Button sx={style.save} type="submit" variant="contained" disabled={!isValid || !dirty}>
+            </FieldArray>
+            {showQuestionsErrors()}
+            <Button
+              sx={style.save}
+              type="submit"
+              onClick={() => validateForm(values).then((errors) => errors && setErrors(errors))}
+              variant="contained"
+            >
               Save
             </Button>
           </Form>

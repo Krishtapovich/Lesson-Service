@@ -26,8 +26,11 @@ export const optionsContainer: SxProps = {
   overflowY: "auto",
   marginY: 2,
 
+  "&::-webkit-scrollbar": {
+    height: 4
+  },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#1c7483",
+    backgroundColor: "#1c7483"
   }
 };
 
@@ -51,6 +54,10 @@ export const deleteIcon: SxProps = {
   "&:hover": {
     transform: "scale(1.3)"
   }
+};
+
+export const errorText: SxProps = {
+  color: "red",
 };
 
 const addButton: SxProps = {

@@ -32,7 +32,6 @@ export default class SurveyStore {
   disposeResults() {
     this.answers = [];
     this.surveyStudents = [];
-    this.surveyQuestions = [];
     this.visualization = [];
   }
 

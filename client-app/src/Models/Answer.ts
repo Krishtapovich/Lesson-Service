@@ -1,9 +1,8 @@
-import { OptionModel } from "./Option";
+import { QuestionModel } from "./Question";
 
 export default interface AnswerModel {
-  id: number;
   text?: string;
-  option?: OptionModel;
-  questionText: string;
   imageUrl?: string;
+  optionId?: number;
+  question: QuestionModel;
 }

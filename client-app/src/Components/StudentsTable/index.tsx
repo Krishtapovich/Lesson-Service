@@ -5,7 +5,7 @@ import { button, tableBodyCell, tableHeaderCell } from "./style";
 
 interface Props {
   students: Array<StudentModel>;
-  resultsCallback: (studentId: number) => void;
+  resultsCallback: (student: StudentModel) => void;
 }
 
 function StudentsTable(props: Props) {
@@ -19,10 +19,10 @@ function StudentsTable(props: Props) {
             <MUI.Typography>Group</MUI.Typography>
           </MUI.TableCell>
           <MUI.TableCell align="center" sx={tableHeaderCell}>
-            <MUI.Typography>First Name</MUI.Typography>
+            <MUI.Typography>Last Name</MUI.Typography>
           </MUI.TableCell>
           <MUI.TableCell align="center" sx={tableHeaderCell}>
-            <MUI.Typography>Last Name</MUI.Typography>
+            <MUI.Typography>First Name</MUI.Typography>
           </MUI.TableCell>
           <MUI.TableCell sx={tableHeaderCell}></MUI.TableCell>
         </MUI.TableRow>
@@ -34,13 +34,13 @@ function StudentsTable(props: Props) {
               <MUI.Typography>{s.groupNumber}</MUI.Typography>
             </MUI.TableCell>
             <MUI.TableCell align="center" sx={tableBodyCell}>
-              <MUI.Typography>{s.firstName}</MUI.Typography>
-            </MUI.TableCell>
-            <MUI.TableCell align="center" sx={tableBodyCell}>
               <MUI.Typography>{s.lastName}</MUI.Typography>
             </MUI.TableCell>
             <MUI.TableCell align="center" sx={tableBodyCell}>
-              <MUI.Button size="small" onClick={() => resultsCallback(s.id)} sx={button}>
+              <MUI.Typography>{s.firstName}</MUI.Typography>
+            </MUI.TableCell>
+            <MUI.TableCell align="center" sx={tableBodyCell}>
+              <MUI.Button size="small" onClick={() => resultsCallback(s)} sx={button}>
                 View Results
               </MUI.Button>
             </MUI.TableCell>
