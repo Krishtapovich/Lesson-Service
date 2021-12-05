@@ -1,8 +1,23 @@
+import { OptionModel } from "./Option";
 import { QuestionModel } from "./Question";
 
-export default interface AnswerModel {
+export interface AnswerModel {
   text?: string;
   imageUrl?: string;
-  optionId?: number;
+  option?: OptionModel;
   question: QuestionModel;
+}
+
+export interface AnswerCsvModel {
+  groupNumber: string;
+  firstName: string;
+  lastName: string;
+  questionText: string;
+  answerText: string;
+}
+
+export interface StudentCsvAnswerModel {
+  questionText: string;
+  answerText: string;
+  isCorrect: boolean;
 }

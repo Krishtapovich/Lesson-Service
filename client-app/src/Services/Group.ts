@@ -1,14 +1,22 @@
-import GroupModel from "@Models/Group";
+import StudentModel from "@Models/Student";
 
 import BaseService from "./Base";
 
 class GroupService extends BaseService {
-  getGroups(pageNumber: number, pageSize: number) {
-    return this.requests.get<Array<GroupModel>>("group/groups-list", { pageNumber, pageSize });
+  getStudents() {
+    return this.requests.get<Array<StudentModel>>("group/students-list");
   }
 
   getGroupsNumbers() {
     return this.requests.get<Array<string>>("group/groups-numbers");
+  }
+
+  updateStudent(student: StudentModel) {
+    return this.requests.put<void>("group/update-student", student, {});
+  }
+
+  deleteStudent(studentId: number) {
+    return this.requests.delete<void>("group/delete-student", { studentId });
   }
 }
 

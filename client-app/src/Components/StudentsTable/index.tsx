@@ -1,15 +1,18 @@
+import { AnswerCsvModel } from "@Models/Answer";
 import StudentModel from "@Models/Student";
 import * as MUI from "@mui/material";
+import { CSVLink } from "react-csv";
 
-import { button, tableBodyCell, tableHeaderCell } from "./style";
+import { button, link, tableBodyCell, tableHeaderCell } from "./style";
 
 interface Props {
   students: Array<StudentModel>;
+  csvAnswers: Array<AnswerCsvModel>;
   resultsCallback: (student: StudentModel) => void;
 }
 
 function StudentsTable(props: Props) {
-  const { students, resultsCallback } = props;
+  const { students, csvAnswers, resultsCallback } = props;
 
   return (
     <MUI.Table stickyHeader>
@@ -24,7 +27,11 @@ function StudentsTable(props: Props) {
           <MUI.TableCell align="center" sx={tableHeaderCell}>
             <MUI.Typography>First Name</MUI.Typography>
           </MUI.TableCell>
-          <MUI.TableCell sx={tableHeaderCell}></MUI.TableCell>
+          <MUI.TableCell align="center" sx={tableHeaderCell}>
+            <CSVLink filename="answers" data={csvAnswers} style={link}>
+              <MUI.Button sx={button}>Download Answers</MUI.Button>
+            </CSVLink>
+          </MUI.TableCell>
         </MUI.TableRow>
       </MUI.TableHead>
       <MUI.TableBody>

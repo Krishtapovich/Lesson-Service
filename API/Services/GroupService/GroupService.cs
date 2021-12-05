@@ -14,14 +14,24 @@ namespace API.Services.GroupService
             this.groupRepository = groupRepository;
         }
 
-        public async ValueTask<IEnumerable<GroupModel>> GetGroupsAsync(int pageNumber, int pageSize)
-        {
-            return await groupRepository.GetGroupsAsync(pageNumber, pageSize);
-        }
-
         public async ValueTask<IEnumerable<string>> GetGroupsNumbersAsync()
         {
             return await groupRepository.GetGroupsNumbersAsync();
+        }
+
+        public async ValueTask<IEnumerable<StudentModel>> GetStudentsAsync()
+        {
+            return await groupRepository.GetStudentsAsync();
+        }
+
+        public async ValueTask UpdateStudentAsync(StudentModel student)
+        {
+            await groupRepository.UpdateStudentAsync(student);
+        }
+
+        public async ValueTask DeleteStudentAsync(long studentId)
+        {
+            await groupRepository.DeleteStudentAsync(studentId);
         }
     }
 }

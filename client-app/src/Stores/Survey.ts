@@ -1,4 +1,4 @@
-import AnswerModel from "@Models/Answer";
+import { AnswerCsvModel, AnswerModel, StudentCsvAnswerModel } from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
 import StudentModel from "@Models/Student";
 import * as Survey from "@Models/Survey";
@@ -10,10 +10,12 @@ import uuid from "uuid";
 
 export default class SurveyStore {
   surveys: Array<Survey.SurveyListModel> = [];
+  currentSurvey?: Survey.SurveyListModel;
   surveyQuestions: Array<QuestionModel> = [];
   surveyStudents: Array<StudentModel> = [];
+
   answers: Array<AnswerModel> = [];
-  currentSurvey?: Survey.SurveyListModel;
+  csvAnswers: Array<AnswerCsvModel> = [];
   visualization: Array<AnswerVisualizationModel> = [];
 
   isLoading = false;
@@ -28,7 +30,7 @@ export default class SurveyStore {
   disposePreview() {
     this.surveyQuestions = [];
   }
-
+  
   disposeResults() {
     this.answers = [];
     this.surveyStudents = [];
@@ -87,15 +89,25 @@ export default class SurveyStore {
     }, LOAD_TIME);
   }
 
-  getStudentAnswers(surveyId: string, studentId: number) {
+  async getSurveyCsvAnswers(surveyId: string) {
+    const csvAnswers = await surveyService.getSurveyCsvAnswers(surveyId);
+    runInAction(() => (this.csvAnswers = csvAnswers));
+  }
+
+  async getStudentAnswers(surveyId: string, studentId: number) {
     this.isStudentAnswersLoading = true;
-    setTimeout(async () => {
-      const answers = await surveyService.getStudentAnswers(surveyId, studentId);
+    const answers = await surveyService.getStudentAnswers(surveyId, studentId);
+    setTimeout(() => {
       runInAction(() => {
         this.answers = answers;
         this.isStudentAnswersLoading = false;
       });
     }, LOAD_TIME);
+    return answers.map<StudentCsvAnswerModel>((a) => ({
+      answerText: a.option?.text || a.text || a.imageUrl || "",
+      questionText: a.question.text,
+      isCorrect: a.option?.isCorrect || false
+    }));
   }
 
   async addSurvey(formSurvey: Survey.SurveyFormModel) {

@@ -1,10 +1,10 @@
-import GroupModel from "@Models/Group";
+import StudentModel from "@Models/Student";
 import groupService from "@Services/Group";
 import { LOAD_TIME } from "@Utils/Theme";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export default class GroupStore {
-  groups: Array<GroupModel> = [];
+  students: Array<StudentModel> = [];
   groupsNumbers: Array<string> = [];
 
   isLoading = false;
@@ -14,17 +14,19 @@ export default class GroupStore {
   }
 
   dispose() {
-    this.groups = [];
+    this.students = [];
+    this.groupsNumbers = [];
   }
 
-  async init() {
-    const groups = await groupService.getGroups(1, 1);
-    runInAction(() => (this.groups = groups));
-  }
-
-  async getGroups(pageNumber: number, pageSize: number) {
-    const groups = await groupService.getGroups(pageNumber, pageSize);
-    runInAction(() => this.groups.concat(groups));
+  getStudents() {
+    this.isLoading = true;
+    setTimeout(async () => {
+      const students = await groupService.getStudents();
+      runInAction(() => {
+        this.students = students;
+        this.isLoading = false;
+      });
+    }, LOAD_TIME);
   }
 
   getGroupsNumbers() {
@@ -36,5 +38,15 @@ export default class GroupStore {
         this.isLoading = false;
       });
     }, LOAD_TIME);
+  }
+
+  updateStudent(student: StudentModel) {
+    this.students = this.students.map((s) => (s.id === student.id ? student : s));
+    groupService.updateStudent(student);
+  }
+
+  deleteStudent(studentId: number) {
+    this.students = this.students.filter((s) => s.id !== studentId);
+    groupService.deleteStudent(studentId);
   }
 }

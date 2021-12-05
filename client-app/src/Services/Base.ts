@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-axios.defaults.baseURL = "http://localhost:10274/api";
+axios.defaults.baseURL = "https://localhost:443/api";
 
 class BaseService {
   private responseData<T>(response: AxiosResponse<T>) {

@@ -31,6 +31,6 @@ namespace Domain.Repositories.SurveyRepository
         ValueTask RegisterAnswerAsync(int messageId, string answerText = null, ImageModel image = null);
         ValueTask RegisterAnswerAsync(string pollId, string optionText);
 
-        ValueTask DeleteStudentSurveyInfoAsync(long studentId);
+        ValueTask DeleteStudentSurveyInfoAsync(StudentModel student);
     }
 }

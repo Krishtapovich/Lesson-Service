@@ -20,12 +20,9 @@ namespace Domain.Repositories.GroupRepository
             return await context.Groups.Select(g => g.Number).ToListAsync();
         }
 
-        public async ValueTask<IEnumerable<GroupModel>> GetGroupsAsync(int pageNumber, int pageSize)
+        public async ValueTask<IEnumerable<StudentModel>> GetStudentsAsync()
         {
-            return await context.Groups.Include(g => g.Students)
-                                       .Skip((pageNumber - 1) * pageSize)
-                                       .Take(pageSize)
-                                       .ToListAsync();
+            return await context.Students.ToListAsync();
         }
 
         public async ValueTask AddStudentAsync(StudentModel student)
@@ -44,9 +41,11 @@ namespace Domain.Repositories.GroupRepository
             return student is not null;
         }
 
-        public async ValueTask DeleteStudentAsync(StudentModel student)
+        public async ValueTask DeleteStudentAsync(long studentId)
         {
-            throw new System.NotImplementedException();
+            var student = await context.Students.FindAsync(studentId);
+            context.Students.Remove(student);
+            await context.SaveChangesAsync();
         }
 
         public async ValueTask UpdateStudentAsync(StudentModel newStudent)

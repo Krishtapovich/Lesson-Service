@@ -137,14 +137,17 @@ namespace Domain.Repositories.SurveyRepository
 
         public async ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId)
         {
-            return  await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).Select(qm => qm.Student).Distinct().ToListAsync();
+            return await context.QuestionMessages.Where(qm => qm.Question.SurveyId == surveyId).Select(qm => qm.Student).Distinct().ToListAsync();
         }
 
         public async ValueTask<IEnumerable<AnswerModel>> GetSurveyAnswersAsync(Guid surveyId)
         {
             return await context.Answers.Include(a => a.QuestionMessage)
                                         .ThenInclude(qm => qm.Question)
+                                        .Include(a => a.QuestionMessage)
+                                        .ThenInclude(qm => qm.Student)
                                         .Include(a => a.Option)
+                                        .Include(a => a.Image)
                                         .Where(a => a.SurveyId == surveyId)
                                         .ToListAsync();
         }
@@ -215,11 +218,15 @@ namespace Domain.Repositories.SurveyRepository
         }
 
 
-        public async ValueTask DeleteStudentSurveyInfoAsync(long studentId)
+        public async ValueTask DeleteStudentSurveyInfoAsync(StudentModel student)
         {
-            var questionMessages = await context.QuestionMessages.Where(qm => qm.StudentId == studentId).ToListAsync();
-            context.QuestionMessages.RemoveRange(questionMessages);
-            await context.SaveChangesAsync();
+            var oldStudent = await context.Students.FindAsync(student.Id);
+            if (oldStudent.GroupNumber != student.GroupNumber)
+            {
+                var questionMessages = await context.QuestionMessages.Where(qm => qm.StudentId == student.Id).ToListAsync();
+                context.QuestionMessages.RemoveRange(questionMessages);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -12,11 +12,17 @@ namespace API.Services.SurveyService
         ValueTask<IEnumerable<SurveyListModel>> GetSurveysAsync();
         ValueTask<IEnumerable<QuestionDto>> GetSurveyQuestionsAsync(Guid surveyId);
         ValueTask<IEnumerable<StudentModel>> GetSurveyStudentsAsync(Guid surveyId);
+
         ValueTask<IEnumerable<AnswerDto>> GetSurveyAnswersAsync(Guid surveyId);
         ValueTask<IEnumerable<AnswerVisualizationModel>> GetSurveyAnswersVisualizationAsync(Guid surveyId);
+        ValueTask<IEnumerable<CsvModel>> GetSurveyCsvAnswersAsync(Guid surveyId);
         ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId);
+
         ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto);
-        ValueTask DeleteSurveyAsync(Guid surveyId);
+
         ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
+        ValueTask DeleteStudentSurveyInfoAsync(StudentModel student);
+
+        ValueTask DeleteSurveyAsync(Guid surveyId);
     }
 }

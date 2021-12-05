@@ -64,10 +64,23 @@ namespace API.Services.SurveyService
             return visualization;
         }
 
+        public async ValueTask<IEnumerable<CsvModel>> GetSurveyCsvAnswersAsync(Guid surveyId)
+        {
+            var answers = await surveyRepository.GetSurveyAnswersAsync(surveyId);
+            return mapper.Map<IEnumerable<CsvModel>>(answers);
+        }
+
         public async ValueTask<IEnumerable<AnswerDto>> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {
             var answers = await surveyRepository.GetStudentAnswersAsync(surveyId, studentId);
-            return mapper.Map<IEnumerable<AnswerDto>>(answers);
+            var val = mapper.Map<IEnumerable<AnswerDto>>(answers);
+           return mapper.Map<IEnumerable<AnswerDto>>(answers);
+        }
+
+        public async ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto)
+        {
+            var newSurvey = await surveyRepository.AddSurveyAsync(mapper.Map<SurveyModel>(surveyDto));
+            return mapper.Map<SurveyDto>(newSurvey);
         }
 
         public async ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened)
@@ -75,10 +88,9 @@ namespace API.Services.SurveyService
             await surveyRepository.ChangeSurveyStatusAsync(surveyId, isOpened);
         }
 
-        public async ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto)
+        public async ValueTask DeleteStudentSurveyInfoAsync(StudentModel student)
         {
-            var newSurvey = await surveyRepository.AddSurveyAsync(mapper.Map<SurveyModel>(surveyDto));
-            return mapper.Map<SurveyDto>(newSurvey);
+            await surveyRepository.DeleteStudentSurveyInfoAsync(student);
         }
 
         public async ValueTask DeleteSurveyAsync(Guid surveyId)

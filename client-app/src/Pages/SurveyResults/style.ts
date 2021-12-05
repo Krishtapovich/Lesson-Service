@@ -11,10 +11,9 @@ export const content: SxProps = {
 };
 
 export const tableWrapper: SxProps = {
-  width: "fit-content",
+  width:"40%",
   height: "fit-content",
   maxHeight: "100%",
-  flexGrow: 1,
   overflowY: "auto",
   marginRight: 7,
   borderRadius: 3,
@@ -24,5 +23,6 @@ export const tableWrapper: SxProps = {
 };
 
 export const card: SxProps = {
-  width: "50%"
+  width: "50%",
+  flexGrow: 1
 };

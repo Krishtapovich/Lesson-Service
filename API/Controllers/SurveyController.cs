@@ -53,6 +53,12 @@ namespace API.Controllers
             return Ok(await surveyService.GetSurveyAnswersVisualizationAsync(surveyId));
         }
 
+        [HttpGet("survey-csv-answers")]
+        public async ValueTask<IActionResult> GetSurveyCsvAnswersAsync(Guid surveyId)
+        {
+            return Ok(await surveyService.GetSurveyCsvAnswersAsync(surveyId));
+        }
+
         [HttpGet("student-answers")]
         public async ValueTask<IActionResult> GetStudentAnswersAsync(Guid surveyId, long studentId)
         {

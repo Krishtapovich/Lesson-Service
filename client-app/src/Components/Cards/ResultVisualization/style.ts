@@ -15,19 +15,26 @@ export const contentWrapper: SxProps = {
   overflowY: "auto",
 
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#39aebd",
-  },
+    backgroundColor: "#39aebd"
+  }
+};
+
+export const placeholder: SxProps = {
+  color: "white",
+  marginTop: "41%",
+  textAlign: "center",
+  fontSize: 30,
+  fontWeight: 600
 };
 
 export const chartWrapper: SxProps = {
-  maxWidth: "97%",
   overflowX: "auto",
   "&::-webkit-scrollbar": {
     height: 4,
-    width: "auto",
+    width: "auto"
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#39aebd",
+    backgroundColor: "#39aebd"
   }
 };
 

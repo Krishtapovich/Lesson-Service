@@ -5,8 +5,17 @@ export const card: SxProps = {
   boxShadow: 5,
   flexGrow: 1,
   borderRadius: 3,
-  padding: 2,
+  paddingY: 2,
   position: "relative"
+};
+
+export const content: SxProps = {
+  height: "88%",
+  overflowY: "auto",
+  paddingX: 3,
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#39aebd"
+  }
 };
 
 export const header: SxProps = {
@@ -15,7 +24,7 @@ export const header: SxProps = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 2
+  paddingX: 2
 };
 
 export const loader: SxProps = {
@@ -30,6 +39,25 @@ export const title: SxProps = {
   color: "white"
 };
 
+export const answer: SxProps = {
+  "&:not(:first-of-type)": {
+    marginTop: 2
+  }
+};
+export const answerHeader: SxProps = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center"
+};
+
+export const checkbox: SxProps = {
+  color: "white",
+  "&.Mui-checked": {
+    color: "#349bae"
+  }
+};
+
 export const question: SxProps = {
   fontSize: 23,
   fontWeight: 600,
@@ -41,6 +69,12 @@ export const textAnswer: SxProps = {
   color: "white",
   fontSize: 18,
   fontWeight: 500
+};
+
+export const imageAnswer: SxProps = {
+  marginTop: 1,
+  borderRadius: 3,
+  width: "75%"
 };
 
 export const option = (isCorrect: boolean, isWrong: boolean): SxProps => {
@@ -58,4 +92,19 @@ export const option = (isCorrect: boolean, isWrong: boolean): SxProps => {
       fontWeight: 500
     }
   };
+};
+
+export const link: React.CSSProperties = {
+  textDecoration: "none"
+};
+
+export const button: SxProps = {
+  marginY: 2,
+  borderRadius: 5,
+  backgroundColor: "#39aebd",
+  transition: "0.2s",
+  "&:hover": {
+    backgroundColor: "#39aebd",
+    transform: "scale(1.1)"
+  }
 };

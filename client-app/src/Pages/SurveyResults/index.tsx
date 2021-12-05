@@ -15,11 +15,12 @@ function SurveyResultsPage() {
   const { surveyStore } = useStore();
   const { surveyId } = useParams();
 
-  const { surveyStudents, visualization, isAllAnswersLoading } = surveyStore;
-
+  const { surveyStudents, visualization, isAllAnswersLoading, csvAnswers } = surveyStore;
+  
   useEffect(() => {
     surveyStore.getSurveyStudents(surveyId!);
     surveyStore.getSurveyAnswers(surveyId!);
+    surveyStore.getSurveyCsvAnswers(surveyId!);
     return () => surveyStore.disposeResults();
   }, [surveyStore, surveyId]);
 
@@ -31,6 +32,7 @@ function SurveyResultsPage() {
         <Box sx={tableWrapper}>
           <StudentsTable
             students={surveyStudents}
+            csvAnswers={csvAnswers}
             resultsCallback={(student) => setStudent(student)}
           />
         </Box>

@@ -185,8 +185,8 @@ namespace Application.Bot
             var isAuthorized = await groupRepository.CheckIfAuthorizedAsync(message.Chat.Id);
             if (isAuthorized)
             {
+                //await surveyRepository.DeleteStudentSurveyInfoAsync(student);
                 await groupRepository.UpdateStudentAsync(student);
-                await surveyRepository.DeleteStudentSurveyInfoAsync(student.Id);
             }
             else
             {

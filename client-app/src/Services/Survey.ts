@@ -1,4 +1,4 @@
-import AnswerModel from "@Models/Answer";
+import { AnswerModel, AnswerCsvModel } from "@Models/Answer";
 import { QuestionModel } from "@Models/Question";
 import StudentModel from "@Models/Student";
 import { SurveyCreateModel, SurveyListModel, SurveySendingModel } from "@Models/Survey";
@@ -27,6 +27,10 @@ class SurveyService extends BaseService {
     return this.requests.get<Array<AnswerVisualizationModel>>("survey/survey-visualization", {
       surveyId
     });
+  }
+
+  getSurveyCsvAnswers(surveyId: string) {
+    return this.requests.get<Array<AnswerCsvModel>>("survey/survey-csv-answers", { surveyId });
   }
 
   getStudentAnswers(surveyId: string, studentId: number) {
