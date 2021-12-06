@@ -88,11 +88,6 @@ namespace API.Services.SurveyService
             await surveyRepository.ChangeSurveyStatusAsync(surveyId, isOpened);
         }
 
-        public async ValueTask DeleteStudentSurveyInfoAsync(StudentModel student)
-        {
-            await surveyRepository.DeleteStudentSurveyInfoAsync(student);
-        }
-
         public async ValueTask DeleteSurveyAsync(Guid surveyId)
         {
             var images = await surveyRepository.GetAnswersImagesAsync(surveyId);

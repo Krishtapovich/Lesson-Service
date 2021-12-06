@@ -134,21 +134,20 @@ namespace Application.Bot
                 {
                     foreach (var question in questions)
                     {
-                        var questionMessage = await SendQuestionAsync(student, question, survey.OpenPeriod);
+                        var questionMessage = await SendQuestionAsync(student, question);
                         await surveyRepository.AddQuestionMessageAsync(question.Id, questionMessage);
                     }
-
                 }
             }
         }
 
-        private async ValueTask<QuestionMessage> SendQuestionAsync(StudentModel student, QuestionModel question, int? openPeriod = null)
+        private async ValueTask<QuestionMessage> SendQuestionAsync(StudentModel student, QuestionModel question)
         {
             Message message;
             if (question.Options.Any())
             {
                 var pollOptions = question.Options.Select(o => o.Text);
-                message = await bot.SendPollAsync(student.Id, question.Text, pollOptions, openPeriod: openPeriod);
+                message = await bot.SendPollAsync(student.Id, question.Text, pollOptions);
             }
             else
             {
@@ -183,16 +182,7 @@ namespace Application.Bot
             };
 
             var isAuthorized = await groupRepository.CheckIfAuthorizedAsync(message.Chat.Id);
-            if (isAuthorized)
-            {
-                //await surveyRepository.DeleteStudentSurveyInfoAsync(student);
-                await groupRepository.UpdateStudentAsync(student);
-            }
-            else
-            {
-                await groupRepository.AddStudentAsync(student);
-            }
-
+            await (isAuthorized ? groupRepository.UpdateStudentAsync(student) : groupRepository.AddStudentAsync(student));
             var replyButton = new ReplyKeyboardMarkup(new KeyboardButton[] { BotConstants.Update }) { ResizeKeyboard = true };
             await bot.SendTextMessageAsync(message.Chat.Id, BotConstants.DataSaved, replyMarkup: replyButton);
         }

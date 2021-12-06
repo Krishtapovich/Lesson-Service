@@ -38,9 +38,14 @@ function SurveyCreationPage() {
               })
             )
             .test(
-              "test-amount",
+              "test-min-amount",
               "Questions with options should have at least 2 options",
               async (value: any) => !value || !value.length || value.length > 1
+            )
+            .test(
+              "test-max-amount",
+              "Questions with options can have 10 options",
+              async (value: any) => !value || !value.length || value.length < 11
             )
             .test(
               "test-isCorrect",

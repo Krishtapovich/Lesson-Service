@@ -30,7 +30,5 @@ namespace Domain.Repositories.SurveyRepository
         ValueTask<IEnumerable<AnswerModel>> GetStudentAnswersAsync(Guid surveyId, long studentId);
         ValueTask RegisterAnswerAsync(int messageId, string answerText = null, ImageModel image = null);
         ValueTask RegisterAnswerAsync(string pollId, string optionText);
-
-        ValueTask DeleteStudentSurveyInfoAsync(StudentModel student);
     }
 }

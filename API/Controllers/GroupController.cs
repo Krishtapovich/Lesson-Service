@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using API.Services.GroupService;
-using API.Services.SurveyService;
 using Domain.Models.Group;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +10,10 @@ namespace API.Controllers
     public class GroupController : Controller
     {
         private readonly IGroupService groupService;
-        private readonly ISurveyService surveyService;
 
-        public GroupController(IGroupService groupService, ISurveyService surveyService)
+        public GroupController(IGroupService groupService)
         {
             this.groupService = groupService;
-            this.surveyService = surveyService;
         }
 
         [HttpGet("groups-numbers")]
@@ -34,7 +31,6 @@ namespace API.Controllers
         [HttpPut("update-student")]
         public async ValueTask<IActionResult> UpdateStudentAsync([FromBody] StudentModel student)
         {
-            //await surveyService.DeleteStudentSurveyInfoAsync(student);
             await groupService.UpdateStudentAsync(student);
             return Ok();
         }

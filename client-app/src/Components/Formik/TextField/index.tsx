@@ -1,5 +1,6 @@
 import { TextFieldProps } from "@mui/material";
 import { FieldHookConfig, useField } from "formik";
+import React from "react";
 
 import { TextInput } from "./style";
 
@@ -9,4 +10,4 @@ function TextField(props: FieldHookConfig<string> & TextFieldProps) {
   return <TextInput error={!!error} helperText={error} InputProps={field} {...props} />;
 }
 
-export default TextField;
+export default React.memo(TextField);

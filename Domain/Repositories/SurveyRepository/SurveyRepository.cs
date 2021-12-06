@@ -216,17 +216,5 @@ namespace Domain.Repositories.SurveyRepository
             }
             await context.SaveChangesAsync();
         }
-
-
-        public async ValueTask DeleteStudentSurveyInfoAsync(StudentModel student)
-        {
-            var oldStudent = await context.Students.FindAsync(student.Id);
-            if (oldStudent.GroupNumber != student.GroupNumber)
-            {
-                var questionMessages = await context.QuestionMessages.Where(qm => qm.StudentId == student.Id).ToListAsync();
-                context.QuestionMessages.RemoveRange(questionMessages);
-                await context.SaveChangesAsync();
-            }
-        }
     }
 }

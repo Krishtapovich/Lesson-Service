@@ -21,7 +21,6 @@ namespace API.Services.SurveyService
         ValueTask<SurveyDto> CreateSurveyAsync(SurveyDto surveyDto);
 
         ValueTask ChangeSurveyStatusAsync(Guid surveyId, bool isOpened);
-        ValueTask DeleteStudentSurveyInfoAsync(StudentModel student);
 
         ValueTask DeleteSurveyAsync(Guid surveyId);
     }
